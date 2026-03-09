@@ -1,7 +1,6 @@
 {
-    "name": "@shipout/cli",
-    "version": "1.0.0",
-    "private": true,
+    "name": "shipout",
+    "version": "0.0.8",
     "bin": {
         "shipout": "./dist/index.js"
     },

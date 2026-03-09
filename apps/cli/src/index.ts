@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // Silence environment noise before any imports
 process.env.DOTENV_CONFIG_SILENT = 'true';
 try {
@@ -37,8 +38,7 @@ async function main() {
     const isJson = args.includes('--json');
 
     if (args.includes('--version') || args.includes('-v')) {
-        const pkg = require('../package.json');
-        console.log(`Shipout CLI v${pkg.version}`);
+        console.log(`Shipout Beta v0.0.8`);
         return;
     }
 
@@ -113,7 +113,7 @@ async function runLiveScan(target: string, isDebug: boolean, isJson: boolean): P
     const planner = new AgentPlanner({
         maxTools: 25,
         maxRequests: 200,
-        maxTime: 300000,
+        maxTime: 300000, // 5 minute timeout for live runs
         debug: isDebug
     }, toolExecutor, cliLogger);
 
