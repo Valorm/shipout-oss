@@ -36,14 +36,13 @@ export async function runDoctor() {
         console.log('❌ GEMINI_API_KEY Missing');
     }
 
-    // 4. Check Engine Directories
     const fs = require('fs');
     const path = require('path');
-    const corePath = path.join(process.cwd(), 'core');
+    const corePath = path.join(__dirname, '..', '..', 'core');
     if (fs.existsSync(corePath)) {
-        console.log('✅ Shipout Engine (core/ directory found)');
+        console.log('✅ Shipout Engine');
     } else {
-        console.log('❌ Shipout Engine (core/ directory MISSING)');
+        console.log('❌ Shipout Engine (MISSING)');
     }
 
     console.log('\n--- Diagnostic Complete ---\n');
