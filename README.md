@@ -6,39 +6,23 @@ Shipout uses a team of specialized AI agents to perform reconnaissance, expand t
 
 Unlike traditional scanners that run isolated checks, Shipout performs multi-step investigations to uncover deeper security issues.
 
-## Quick Start
+## 🚀 Quick Start
 
-Run your first scan:
+Run a scan immediately with `npx`:
 
 ```bash
-shipout scan https://example.com
+npx shipout scan https://example.com
 ```
 
-Example output:
+### First-Time Setup
+Shipout requires an AI model to run autonomous scans. To configure your Gemini API key:
 
+```bash
+npx shipout setup
 ```
-Shipout Autonomous Scan
-Target: https://example.com
 
-Reconnaissance
-✓ http_probe
-✓ robots_explorer
-✓ sitemap_analyzer
-
-Surface Expansion
-✓ endpoint_discovery
-✓ parameter_fuzzer
-
-Vulnerability Analysis
-✓ xss_probe
-✓ sqli_probe
-✓ open_redirect_probe
-
-Verification
-✓ verify_agent
-
-No confirmed vulnerabilities found.
-```
+1. Create a free Gemini API key: [Google AI Studio](https://aistudio.google.com/app/apikey)
+2. Run `shipout setup` and paste your key.
 
 ## Installation
 
@@ -48,7 +32,7 @@ Install globally with npm:
 npm install -g shipout
 ```
 
-Run a scan:
+Then run:
 
 ```bash
 shipout scan https://target.com
@@ -56,12 +40,13 @@ shipout scan https://target.com
 
 ## CLI Commands
 
-| Command              | Description                              |
-| -------------------- | ---------------------------------------- |
-| `shipout scan <url>` | Run an autonomous security investigation |
-| `shipout doctor`     | Check environment readiness              |
-| `shipout --help`     | Show available commands                  |
-| `shipout --version`  | Show installed version                   |
+| Command              | Description                               |
+| -------------------- | ----------------------------------------- |
+| `shipout scan <url>` | Run an autonomous security investigation  |
+| `shipout setup`      | Interactive configuration for API keys    |
+| `shipout doctor`     | Check environment readiness               |
+| `shipout --help`     | Show available commands                   |
+| `shipout --version`  | Show installed version                    |
 
 ## How Shipout Works
 
