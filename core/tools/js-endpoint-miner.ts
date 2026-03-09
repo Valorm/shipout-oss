@@ -1,4 +1,4 @@
-import { Tool, ToolInput, ToolOutput } from '@shared/types/tool';
+import { Tool, ToolInput, ToolOutput } from '../../packages/shared/types/tool';
 
 function isValidEndpoint(endpoint: string): boolean {
     const noise = ['.css', '.png', '.jpg', '.jpeg', '.svg', '.gif', '.woff', '.woff2', '.ttf', '.otf', '.js', '.map'];

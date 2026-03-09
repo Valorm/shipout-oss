@@ -1,7 +1,7 @@
-import { Agent, AgentDecision } from '@shared/types/agent';
-import { ScanContext } from '@shared/types/scan-context';
+import { Agent, AgentDecision } from '../../packages/shared/types/agent';
+import { ScanContext } from '../../packages/shared/types/scan-context';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { extractJSON } from '@core/engine/utils';
+import { extractJSON } from '../engine/utils';
 
 export class VerifyAgent implements Agent {
     public name = 'VerifyAgent';

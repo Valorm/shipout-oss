@@ -1,5 +1,5 @@
-import { Agent, AgentDecision } from '@shared/types/agent';
-import { ScanContext } from '@shared/types/scan-context';
+import { Agent, AgentDecision } from '../../packages/shared/types/agent';
+import { ScanContext } from '../../packages/shared/types/scan-context';
 
 export class DependencyAgent implements Agent {
     public name = 'DependencyAgent';
