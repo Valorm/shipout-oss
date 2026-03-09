@@ -6,18 +6,7 @@
     "esModuleInterop": true,
     "skipLibCheck": true,
     "strict": false,
-    "baseUrl": ".",
-    "paths": {
-      "@core/*": [
-        "core/*"
-      ],
-      "@shared/*": [
-        "packages/shared/*"
-      ],
-      "@apps/*": [
-        "apps/*"
-      ]
-    }
+    "baseUrl": "."
   },
   "exclude": [
     "node_modules",
