@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 // Silence environment noise before any imports
 process.env.DOTENV_CONFIG_SILENT = 'true';
 try {
@@ -37,8 +38,7 @@ async function main() {
     const isJson = args.includes('--json');
 
     if (args.includes('--version') || args.includes('-v')) {
-        const pkg = require('../package.json');
-        console.log(`Shipout CLI v${pkg.version}`);
+        console.log(`Shipout Beta v0.0.8`);
         return;
     }
 
