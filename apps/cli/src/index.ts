@@ -23,6 +23,8 @@ import { randomUUID } from 'crypto';
 import { cliLogger } from '@core/engine/cli-logger';
 import { LocalExecutor } from '@core/engine/local-executor';
 import * as fs from 'fs';
+import { ConfigManager } from '@core/engine/config';
+import * as readline from 'readline';
 
 dotenv.config({ path: '.env' });
 
@@ -42,6 +44,18 @@ async function main() {
         return;
     }
 
+    // Resolve API Key
+    const apiKeyFlag = args.find(a => a.startsWith('--api-key='))?.split('=')[1];
+    const apiKey = ConfigManager.resolveApiKey(apiKeyFlag);
+    if (apiKey) {
+        process.env.GEMINI_API_KEY = apiKey;
+    }
+
+    if (command === 'setup') {
+        await runSetup();
+        return;
+    }
+
     if (args.includes('--help') || args.includes('-h') || command === 'help' || !command) {
         showHelp();
         return;
@@ -53,6 +67,22 @@ async function main() {
     }
 
     if (command === 'scan') {
+        // Check for API Key before scanning
+        if (!process.env.GEMINI_API_KEY) {
+            console.log('❌ Gemini API key not found.\n');
+            console.log('Shipout requires an AI model to run autonomous scans.');
+            console.log('Create one here: https://aistudio.google.com/app/apikey\n');
+
+            const wantSetup = await promptQuestion('Would you like to set it up now? (y/n): ');
+            if (wantSetup.toLowerCase() === 'y') {
+                await runSetup();
+                // After setup, the key should be in process.env
+            } else {
+                console.log('Please set GEMINI_API_KEY in your environment or use --api-key flag.');
+                process.exit(1);
+            }
+        }
+
         const target = args[1];
         if (!target) {
             console.error('❌ Error: scan requires a target URL or a file containing URLs.');
@@ -92,6 +122,7 @@ Shipout CLI - Autonomous Security Engine
 
 Usage:
   shipout scan <target> Run an autonomous security scan
+  shipout setup         Configure your Gemini API key
   shipout doctor        Check your environment for readiness
   shipout --version     Show version
   shipout --help        Show this message
@@ -100,6 +131,7 @@ Arguments:
   target                A URL or a path to a file containing a list of URLs
 
 Options:
+  --api-key=<key>       Directly provide the Gemini API key
   --json                Output results in JSON format
   --debug               Enable verbose logging
 `);
@@ -157,6 +189,37 @@ async function runLiveScan(target: string, isDebug: boolean, isJson: boolean): P
         }
         return null;
     }
+}
+
+async function promptQuestion(query: string): Promise<string> {
+    const rl = readline.createInterface({
+        input: process.stdin,
+        output: process.stdout,
+    });
+
+    return new Promise(resolve => rl.question(query, ans => {
+        rl.close();
+        resolve(ans);
+    }));
+}
+
+async function runSetup() {
+    console.log('\n🚀 Welcome to Shipout Setup\n');
+    console.log('Shipout requires an AI model to run autonomous scans.');
+    console.log('Create a free Gemini API key here: https://aistudio.google.com/app/apikey\n');
+
+    const apiKey = await promptQuestion('Paste your Gemini API key: ');
+
+    if (!apiKey || apiKey.length < 20) {
+        console.error('❌ Invalid API key provided.');
+        return;
+    }
+
+    await ConfigManager.saveConfig({ gemini_api_key: apiKey });
+    process.env.GEMINI_API_KEY = apiKey;
+
+    console.log(`\n✅ API key saved to: ${ConfigManager.getConfigPath()}`);
+    console.log('You can now run scans without any extra configuration!\n');
 }
 
 main();
