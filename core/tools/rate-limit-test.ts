@@ -1,4 +1,4 @@
-import { Tool, ToolInput, ToolOutput } from '@shared/types/tool';
+import { Tool, ToolInput, ToolOutput } from '../../packages/shared/types/tool';
 
 export const RateLimitTestTool: Tool = {
     name: 'rate_limit_test',

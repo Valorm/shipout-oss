@@ -1,4 +1,4 @@
-import { Tool } from '@shared/types/tool';
+import { Tool } from '../../packages/shared/types/tool';
 
 import { HttpProbeTool } from './http-probe';
 import { EndpointDiscoveryTool } from './endpoint-discovery';
