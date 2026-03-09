@@ -8,6 +8,7 @@
     "packages/shared"
   ],
   "scripts": {
+    "build": "npm run build -w core && npm run build -w @shipout/cli",
     "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",

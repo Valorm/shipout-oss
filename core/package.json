@@ -1,6 +1,9 @@
 {
     "name": "@shipout/core",
     "version": "1.0.0",
+    "scripts": {
+        "build": "tsc"
+    },
     "private": true,
     "dependencies": {
         "@google/generative-ai": "^0.24.1",
