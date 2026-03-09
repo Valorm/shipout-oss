@@ -2,6 +2,7 @@
     "extends": "../../tsconfig.json",
     "compilerOptions": {
         "outDir": "./dist",
+        "rootDir": "../../",
         "baseUrl": ".",
         "paths": {
             "@core/*": [
@@ -13,6 +14,12 @@
         }
     },
     "include": [
-        "src/**/*"
+        "src/**/*",
+        "../../core/**/*",
+        "../../packages/shared/**/*"
+    ],
+    "exclude": [
+        "node_modules",
+        "dist"
     ]
 }

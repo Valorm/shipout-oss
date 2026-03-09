@@ -1,8 +1,8 @@
 {
     "name": "shipout",
-    "version": "0.0.8",
+    "version": "0.0.9",
     "bin": {
-        "shipout": "./dist/index.js"
+        "shipout": "./dist/apps/cli/src/index.js"
     },
     "scripts": {
         "build": "tsc",
