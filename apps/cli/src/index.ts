@@ -6,7 +6,7 @@ try {
     // ignore
 }
 
-import { AgentPlanner } from '@/services/agent-planner';
+import { AgentPlanner } from '@core/engine/planner';
 import { OrchestratorAgent } from '@core/agents/orchestrator-agent';
 import { ReconAgent } from '@core/agents/recon-agent';
 import { WebSecurityAgent } from '@core/agents/web-security-agent';
@@ -17,47 +17,16 @@ import { VerifyAgent } from '@core/agents/verify-agent';
 import { SurfaceExpansionAgent } from '@core/agents/surface-expansion-agent';
 import { ScanContext } from '@shared/types/scan-context';
 import { availableTools } from '@core/tools';
-import { toolRunner } from '@/services/tool-runner';
 import * as dotenv from 'dotenv';
 import { randomUUID } from 'crypto';
-import { cliLogger } from '@/services/agent-planner/cli-logger';
+import { cliLogger } from '@core/engine/cli-logger';
+import { LocalExecutor } from '@core/engine/local-executor';
 import * as fs from 'fs';
 
 dotenv.config({ path: '.env' });
 
-// Local Execution Mock: Run tools directly in the CLI process instead of via Supabase worker
-(toolRunner as any).executeTool = async (toolName: string, input: any) => {
-    const tool = (availableTools as any)[toolName];
-    if (!tool) throw new Error(`Tool ${toolName} not found`);
+const toolExecutor = new LocalExecutor();
 
-    const startTime = Date.now();
-    try {
-        const result = await tool.run(input);
-        return {
-            result,
-            telemetry: {
-                tool: toolName,
-                duration: Date.now() - startTime,
-                requests: result.requestsMade || 0,
-                success: true,
-                result: result.data || {},
-                timestamp: new Date().toISOString()
-            }
-        };
-    } catch (e: any) {
-        return {
-            result: { findings: [], error: e.message },
-            telemetry: {
-                tool: toolName,
-                duration: Date.now() - startTime,
-                requests: 0,
-                success: false,
-                error: e.message,
-                timestamp: new Date().toISOString()
-            }
-        };
-    }
-};
 
 import { runDoctor } from './doctor';
 
@@ -146,7 +115,7 @@ async function runLiveScan(target: string, isDebug: boolean, isJson: boolean): P
         maxRequests: 200,
         maxTime: 300000, // 5 minute timeout for live runs
         debug: isDebug
-    });
+    }, toolExecutor, cliLogger);
 
     const orchestrator = new OrchestratorAgent();
     planner.registerAgent(new ReconAgent());
