@@ -1,5 +1,5 @@
 import { ScanContext, ScanBudget } from '@shared/types/scan-context';
-import { AgentPlanner } from '@/services/agent-planner';
+import { AgentPlanner } from '@core/engine/planner';
 import { OrchestratorAgent } from '@core/agents/orchestrator-agent';
 import { ReconAgent } from '@core/agents/recon-agent';
 import { WebSecurityAgent } from '@core/agents/web-security-agent';
@@ -83,8 +83,8 @@ export class ScanEngine {
         console.log(`[ScanEngine] Generating Gemini-powered final report with ${context.vulnerabilities.length} findings.`);
 
         try {
-            const { ReportService } = await import('@/report-service/engine');
-            const { getAdminClient } = await import('@/database/db');
+            const { ReportService } = await import('@core/report-service/engine');
+            const { getAdminClient } = await import('@core/database/db');
             const supabase = getAdminClient();
 
             // Prepare telemetry/data for Gemini analysis
@@ -157,14 +157,6 @@ export class ScanEngine {
 
         } catch (e: any) {
             console.error(`[ScanEngine] Failed to generate AI report: ${e.message}`);
-            // Fallback: update status at least
-            const { getAdminClient } = await import('@/database/db');
-            const supabase = getAdminClient();
-            await (supabase.from('jobs') as any).update({
-                status: 'FAILED',
-                status_text: `Reporting failed: ${e.message}`,
-                completed_at: new Date().toISOString()
-            }).eq('id', context.jobId);
         }
     }
 }

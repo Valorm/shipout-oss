@@ -1,7 +1,7 @@
 import { Agent, AgentDecision } from '@shared/types/agent';
 import { ScanContext } from '@shared/types/scan-context';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { extractJSON } from '@/services/agent-planner/utils';
+import { extractJSON } from '@core/engine/utils';
 
 export class VerifyAgent implements Agent {
     public name = 'VerifyAgent';

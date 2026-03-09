@@ -1,7 +1,7 @@
 import { Agent, AgentDecision } from '@shared/types/agent';
 import { ScanContext } from '@shared/types/scan-context';
 import { GoogleGenerativeAI } from '@google/generative-ai';
-import { extractJSON } from '@/services/agent-planner/utils';
+import { extractJSON } from '@core/engine/utils';
 
 export class OrchestratorAgent implements Agent {
     public name = 'OrchestratorAgent';
@@ -123,7 +123,7 @@ Respond ONLY with JSON:
             };
         } catch (e: any) {
             // Log to debug instead of error to keep the main CLI clean
-            const { cliLogger } = await import('@/services/agent-planner/cli-logger');
+            const { cliLogger } = await import('@core/engine/cli-logger');
             cliLogger.logDebug(`[OrchestratorAgent] Decision failed: ${e.message}`);
             return { action: 'stop', reasoning: 'LLM failed to respond correctly.' };
         }

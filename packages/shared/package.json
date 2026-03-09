@@ -1,5 +1,8 @@
 {
     "name": "@shipout/shared",
     "version": "1.0.0",
+    "scripts": {
+        "build": "tsc"
+    },
     "private": true
 }

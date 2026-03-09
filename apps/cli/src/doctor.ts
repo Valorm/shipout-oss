@@ -1,6 +1,6 @@
-import { cliLogger } from '@/services/agent-planner/cli-logger';
+import { cliLogger } from '@core/engine/cli-logger';
 import * as dotenv from 'dotenv';
-import { checkConnectivity } from '@/services/agent-planner/utils';
+import { checkConnectivity } from '@core/engine/utils';
 
 dotenv.config({ path: '.env' });
 
