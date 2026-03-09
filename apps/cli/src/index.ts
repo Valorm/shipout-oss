@@ -7,23 +7,23 @@ try {
     // ignore
 }
 
-import { AgentPlanner } from '../../core/engine/planner';
-import { OrchestratorAgent } from '../../core/agents/orchestrator-agent';
-import { ReconAgent } from '../../core/agents/recon-agent';
-import { WebSecurityAgent } from '../../core/agents/web-security-agent';
-import { SecretsAgent } from '../../core/agents/secrets-agent';
-import { DependencyAgent } from '../../core/agents/dependency-agent';
-import { PayloadAgent } from '../../core/agents/payload-agent';
-import { VerifyAgent } from '../../core/agents/verify-agent';
-import { SurfaceExpansionAgent } from '../../core/agents/surface-expansion-agent';
-import { ScanContext } from '../../packages/shared/types/scan-context';
-import { availableTools } from '../../core/tools';
+import { AgentPlanner } from '../../../core/engine/planner';
+import { OrchestratorAgent } from '../../../core/agents/orchestrator-agent';
+import { ReconAgent } from '../../../core/agents/recon-agent';
+import { WebSecurityAgent } from '../../../core/agents/web-security-agent';
+import { SecretsAgent } from '../../../core/agents/secrets-agent';
+import { DependencyAgent } from '../../../core/agents/dependency-agent';
+import { PayloadAgent } from '../../../core/agents/payload-agent';
+import { VerifyAgent } from '../../../core/agents/verify-agent';
+import { SurfaceExpansionAgent } from '../../../core/agents/surface-expansion-agent';
+import { ScanContext } from '../../../packages/shared/types/scan-context';
+import { availableTools } from '../../../core/tools';
 import * as dotenv from 'dotenv';
 import { randomUUID } from 'crypto';
-import { cliLogger } from '../../core/engine/cli-logger';
-import { LocalExecutor } from '../../core/engine/local-executor';
+import { cliLogger } from '../../../core/engine/cli-logger';
+import { LocalExecutor } from '../../../core/engine/local-executor';
 import * as fs from 'fs';
-import { ConfigManager } from '../../core/engine/config';
+import { ConfigManager } from '../../../core/engine/config';
 import * as readline from 'readline';
 
 dotenv.config({ path: '.env' });
