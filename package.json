@@ -3,22 +3,15 @@
   "version": "1.0.0",
   "private": true,
   "workspaces": [
-    "apps/*",
+    "apps/cli",
     "core",
-    "packages/*"
+    "packages/shared"
   ],
   "scripts": {
-    "dev": "npm run dev -w @shipout/web",
-    "dev:worker": "tsx --env-file=.env services/job-queue/consumer.ts",
-    "worker": "tsx workers/static-analysis-worker/entrypoint.ts",
-    "consumer": "tsx services/job-queue/consumer.ts",
-    "build": "npm run build -w @shipout/web",
-    "start": "npm run start -w @shipout/web",
     "lint": "eslint .",
     "test": "vitest",
     "test:run": "vitest run",
-    "scan": "tsx apps/cli/src/index.ts",
-    "clean": "npm run clean -w @shipout/web"
+    "scan": "tsx apps/cli/src/index.ts"
   },
   "dependencies": {
     "@google/generative-ai": "^0.24.1",
