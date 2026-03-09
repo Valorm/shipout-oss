@@ -1,0 +1,19 @@
+# Dependencies
+node_modules/
+
+# Next.js
+.next/
+dist/
+
+# Environment variables (protect secrets)
+.env*
+!.env.example
+
+# Logs
+*.log
+
+# Coverage
+coverage/
+
+# OS files
+.DS_Store

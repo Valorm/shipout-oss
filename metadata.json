@@ -1,0 +1,5 @@
+{
+  "name": "shipout",
+  "description": "Security audit and vulnerability scanning tool for websites and repositories.",
+  "requestFramePermissions": []
+}

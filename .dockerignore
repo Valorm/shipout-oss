@@ -1,0 +1,12 @@
+node_modules
+.next
+.git
+.env
+.github
+npm-debug.log
+yarn-error.log
+README.md
+tmp
+dist
+build
+.vscode

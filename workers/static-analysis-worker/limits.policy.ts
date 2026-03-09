@@ -1,0 +1,10 @@
+export const WorkerLimitsPolicy = {
+  MAX_RAM_MB: 512,
+  MAX_VCPU: 1,
+  TIMEOUT_SECONDS: 300,
+  NETWORK_EGRESS_CAP_MBPS: 50,
+  MAX_NETWORK_CALLS: 50,
+  ALLOW_PRIVILEGE_ESCALATION: false,
+  READ_ONLY_ROOTFS: true,
+  MAX_FILE_COUNT: 10000
+} as const;
