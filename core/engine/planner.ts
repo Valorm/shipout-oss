@@ -133,6 +133,15 @@ export class AgentPlanner {
                     }
                 }
 
+                if (decision.updateFinding) {
+                    const update = decision.updateFinding;
+                    const targetFinding = context.vulnerabilities.find(v => !v.verified);
+                    if (targetFinding) {
+                        Object.assign(targetFinding, update);
+                        this.logger.logDebug(`[${currentAgent.name}] Updated finding: ${targetFinding.description} (Confidence: ${targetFinding.confidence})`);
+                    }
+                }
+
                 if (decision.action === 'stop') {
                     this.logger.logDebug(`Agent ${currentAgent.name} requested stop. Reasoning: ${decision.reasoning}`);
                     context.state = 'analyzing';
@@ -275,9 +284,14 @@ export class AgentPlanner {
                         });
 
                         for (const finding of newFindings) {
+                            // Enrich finding with mission metadata
+                            finding.agent = currentAgent.name;
+                            finding.endpoint = (decision.input as any)?.target || context.target;
+                            finding.parameter = (decision.input as any)?.parameter;
+                            finding.payload = (decision.input as any)?.payload || (decision.input as any)?.body;
+
                             const isDuplicate = context.vulnerabilities.some(v =>
-                                v.type === finding.type &&
-                                v.description === finding.description
+                                v.description === finding.description && v.endpoint === finding.endpoint
                             );
                             if (!isDuplicate) {
                                 context.vulnerabilities.push(finding);
@@ -425,7 +439,7 @@ export class AgentPlanner {
             { tool: 'subdomain_discovery', agent: 'SurfaceExpansionAgent' },
             { tool: 'historical_discovery', agent: 'SurfaceExpansionAgent' },
             { tool: 'header_analysis', agent: 'WebSecurityAgent' },
-            { tool: 'javascript_secret_scan', agent: 'SecretsAgent' },
+            { tool: 'javascript_secret_scan', agent: 'SecretsDiscoveryAgent' },
             { tool: 'dependency_cve_lookup', agent: 'DependencyAgent' },
             { tool: 'payload_fuzz', agent: 'PayloadAgent' }
         ];

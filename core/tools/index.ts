@@ -8,6 +8,8 @@ import { CookieAnalysisTool } from './cookie-analysis';
 import { RateLimitTestTool } from './rate-limit-test';
 import { JavascriptSecretScanTool } from './javascript-secret-scan';
 import { DependencyCveLookupTool } from './dependency-cve-lookup';
+import { DataLeakScanTool } from './data-leak-scan';
+import { FormSecurityAnalysisTool } from './form-security-analysis';
 
 import { SQLiProbeTool } from './sqli-probe';
 import { XSSProbeTool } from './xss-probe';
@@ -45,4 +47,6 @@ export const availableTools: Record<string, Tool> = {
     'subdomain_discovery': SubdomainDiscoveryTool,
     'historical_discovery': HistoricalDiscoveryTool,
     'parameter_fuzzer': ParameterFuzzerTool,
+    'data_leak_scan': DataLeakScanTool,
+    'form_security_analysis': FormSecurityAnalysisTool,
 };

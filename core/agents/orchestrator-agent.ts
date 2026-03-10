@@ -27,20 +27,28 @@ export class OrchestratorAgent implements Agent {
             'ReconAgent',
             'SurfaceExpansionAgent',
             'WebSecurityAgent',
-            'SecretsAgent',
+            'SecretsDiscoveryAgent',
+            'DataLeakAgent',
+            'FormAnalysisAgent',
             'DependencyAgent',
             'PayloadAgent',
-            'VerifyAgent'
+            'VerificationAgent',
+            'ExploitSimulationAgent',
+            'ReportAgent'
         ];
 
         const missionPlan = `
 1. ReconAgent: Basic connectivity and surface mapping (Crawler, Robots, Sitemap).
 2. SurfaceExpansionAgent: Deep discovery (Subdomains, JS mining, Historical URLs, Param fuzzing).
 3. WebSecurityAgent: Passive security audit (Headers, CORS, Cookies).
-4. SecretsAgent: Scanning assets for credentials.
-5. DependencyAgent: Checking tech stack for known CVEs.
-6. PayloadAgent: Active fuzzing and injection testing (SQLi, XSS, SSRF).
-7. VerifyAgent: Validating findings and confidence scoring.
+4. SecretsDiscoveryAgent: Scanning assets for credentials (AWS, Stripe, GitHub, etc.).
+5. DataLeakAgent: Detecting PII, internal IDs, and tokens in responses.
+6. FormAnalysisAgent: Analyzing HTML forms for insecurity (HTTP, CSRF, Masking).
+7. DependencyAgent: Checking tech stack for known CVEs.
+8. PayloadAgent: Active fuzzing and injection testing (SQLi, XSS, SSRF).
+9. VerificationAgent: Validating findings and confidence scoring.
+10. ExploitSimulationAgent: Demonstrating impact of verified vulnerabilities.
+11. ReportAgent: Final synthesis and mission wrap-up.
 `;
 
         const coverage = `Pages: ${context.discoveredPages.length}, Endpoints: ${context.discoveredEndpoints.length}`;
@@ -59,17 +67,21 @@ Loop Stagnation: ${isStagnant}
 Reconnaissance Goal Met: ${reconGoal}
 
 MISSION PIPELINE:
-- [RECON] -> [SURFACE_EXPANSION] -> [SECURITY_AUDIT] -> [FUZZING] -> [VERIFICATION]
+- [RECON] -> [SURFACE_EXPANSION] -> [SECURITY_AUDIT] -> [SECRETS] -> [DATA_LEAK] -> [FORMS] -> [FUZZING] -> [VERIFICATION] -> [SIMULATION] -> [REPORT]
 
 RULES:
 1. If http_probe is false, go to ReconAgent.
 2. If http_probe is true AND SurfaceExpansionAgent hasn't run, go to SurfaceExpansionAgent.
 3. If SurfaceExpansionAgent has run OR no new endpoints are found, move to WebSecurityAgent.
-4. If WebSecurityAgent has run, move to PayloadAgent for active testing.
-4. If findings exist with low confidence, move to VerifyAgent.
-5. In later stages, use PayloadAgent for deep fuzzing.
-6. AVOID returning to ReconAgent if it has already been executed or if Reconnaissance Goal Met is true.
-7. If Loop Stagnation is true, force a transition to an agent that has NOT been heavily used yet.
+4. If WebSecurityAgent has run, move to SecretsDiscoveryAgent.
+5. If SecretsDiscoveryAgent has run, move to DataLeakAgent.
+6. If DataLeakAgent has run, move to FormAnalysisAgent.
+7. If FormAnalysisAgent has run, move to PayloadAgent for active testing.
+8. If PayloadAgent has finished, move to VerificationAgent to confirm finding confidence.
+9. If high-confidence findings exist without impact proof, move to ExploitSimulationAgent.
+10. If everything is verified and simulated, or if mission ends, move to ReportAgent.
+11. AVOID returning to ReconAgent if it has already been executed or if Reconnaissance Goal Met is true.
+12. If Loop Stagnation is true, force transition to an agent that has NOT been heavily used yet.
 
 Respond ONLY with JSON:
 {

@@ -156,23 +156,27 @@ export class CLILogger implements InvestigationLogger {
 
         console.log(`\n${chalk.bold('📊 Scan Summary')}`);
         console.log(chalk.dim('----------------------------------------'));
-        console.log(`- Scan duration: ${chalk.bold(duration + 's')}`);
-        console.log(`- Requests made: ${context.requestsMade}`);
-        console.log(`- Endpoints discovered: ${context.discoveredEndpoints.length}`);
-        console.log(`- Vulnerabilities: ${vulnerabilities.length > 0 ? chalk.red.bold(vulnerabilities.length) : '0'}`);
-        console.log(`- Informational Findings: ${infoFindings.length}`);
+        console.log(`Duration: ${chalk.bold(duration + 's')}`);
+        console.log(`Requests: ${context.requestsMade}`);
+        console.log(`Endpoints: ${context.discoveredEndpoints.length}`);
+        console.log(`Vulnerabilities: ${vulnerabilities.length > 0 ? chalk.red.bold(vulnerabilities.length) : '0'}`);
+        console.log(`Informational Findings: ${infoFindings.length}`);
 
-        if (context.agentsUsed && context.agentsUsed.length > 0) {
-            console.log(`\n${chalk.bold('🤖 Agents Used')}`);
-            console.log(chalk.dim('-----------'));
-            context.agentsUsed.forEach(agent => {
-                console.log(chalk.yellow(agent));
+        if (context.discoveredEndpoints.length > 0) {
+            console.log(`\n${chalk.bold('🔎 Discovered Endpoints')}`);
+            console.log(chalk.dim('----------------------------------------'));
+            const showCount = Math.min(context.discoveredEndpoints.length, 10);
+            context.discoveredEndpoints.slice(0, showCount).forEach(ep => {
+                console.log(chalk.dim(ep));
             });
+            if (context.discoveredEndpoints.length > showCount) {
+                console.log(chalk.dim(`... and ${context.discoveredEndpoints.length - showCount} more`));
+            }
         }
 
         if (context.vulnerabilities.length > 0) {
-            console.log(`\n${chalk.bold('🚨 Findings')}`);
-            console.log(chalk.dim('----------------'));
+            console.log(`\n${chalk.bold('🚨 Vulnerabilities')}`);
+            console.log(chalk.dim('----------------------------------------'));
 
             const severities: ('CRITICAL' | 'HIGH' | 'MEDIUM' | 'LOW' | 'INFO')[] = ['CRITICAL', 'HIGH', 'MEDIUM', 'LOW', 'INFO'];
 
@@ -180,16 +184,44 @@ export class CLILogger implements InvestigationLogger {
                 const filtered = context.vulnerabilities.filter(v => v.severity === sev);
                 if (filtered.length > 0) {
                     let color: (str: string) => string = (s) => s;
-                    let icon = '⚪';
-                    if (sev === 'CRITICAL') { color = chalk.bgRed.white.bold; icon = '🔴'; }
-                    else if (sev === 'HIGH') { color = chalk.red.bold; icon = '🔴'; }
-                    else if (sev === 'MEDIUM') { color = chalk.yellow.bold; icon = '🟠'; }
-                    else if (sev === 'LOW') { color = chalk.yellow.bold; icon = '🟡'; }
-                    else if (sev === 'INFO') { color = chalk.green.bold; icon = '🟢'; }
+                    if (sev === 'CRITICAL') color = chalk.bgRed.white.bold;
+                    else if (sev === 'HIGH') color = chalk.red.bold;
+                    else if (sev === 'MEDIUM') color = chalk.yellow.bold;
+                    else if (sev === 'LOW') color = chalk.yellow;
+                    else if (sev === 'INFO') color = chalk.blue;
 
-                    console.log(`\n${color(sev)}`);
                     filtered.forEach(v => {
-                        console.log(` ${icon} ${v.description}`);
+                        console.log(`\n[${color(sev)}] ${chalk.bold(v.description)}`);
+
+                        if (v.endpoint) {
+                            console.log(`\n${chalk.dim('Endpoint:')}`);
+                            console.log(chalk.yellow(v.endpoint));
+                        }
+
+                        if (v.parameter) {
+                            console.log(`\n${chalk.dim('Parameter:')}`);
+                            console.log(v.parameter);
+                        }
+
+                        if (v.payload) {
+                            console.log(`\n${chalk.dim('Payload:')}`);
+                            console.log(chalk.cyan(v.payload));
+                        }
+
+                        if (v.evidence) {
+                            console.log(`\n${chalk.dim('Evidence:')}`);
+                            if (typeof v.evidence === 'string') {
+                                console.log(v.evidence);
+                            } else {
+                                console.log(JSON.stringify(v.evidence, null, 2));
+                            }
+                        }
+
+                        if (v.agent) {
+                            console.log(`\n${chalk.dim('Agent:')}`);
+                            console.log(chalk.green(v.agent));
+                        }
+                        console.log(chalk.dim('---'));
                     });
                 }
             });

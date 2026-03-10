@@ -14,7 +14,11 @@ export const JavascriptSecretScanTool: Tool = {
             const secretsRegex = {
                 'Generic Secret': /(secret|password|api[_-]?key|token|auth)\s*[:=]\s*["'][^"']+["']/gi,
                 'AWS Key': /AKIA[0-9A-Z]{16}/g,
-                'Slack Token': /xox[baprs]-[0-9a-zA-Z]{10,48}/g
+                'Slack Token': /xox[baprs]-[0-9a-zA-Z]{10,48}/g,
+                'Stripe Key': /sk_live_[0-9a-zA-Z]{24}/g,
+                'Google API Key': /AIza[0-9A-Z-_]{35}/g,
+                'GitHub Token': /gh[opsu]_[0-9a-zA-Z]{36}/g,
+                'Firebase Key': /AIza[0-9A-Z-_]{35}/g
             };
 
             const findings: string[] = [];

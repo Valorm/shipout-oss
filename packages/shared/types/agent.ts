@@ -6,6 +6,7 @@ export interface AgentDecision {
     input?: Record<string, any>; // Args for the tool
     reasoning: string;
     nextAgent?: string; // If action is 'delegate'
+    updateFinding?: Partial<{ confidence: number; verified: boolean; correction: string }>;
 
     // AI Metrics (for agents using Gemini)
     tokens?: {

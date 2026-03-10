@@ -3,8 +3,8 @@ import { ScanContext } from '../../packages/shared/types/scan-context';
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { extractJSON } from '../engine/utils';
 
-export class VerifyAgent implements Agent {
-    public name = 'VerifyAgent';
+export class VerificationAgent implements Agent {
+    public name = 'VerificationAgent';
     public description = 'Verifies potential vulnerabilities to reduce false positives and increase confidence.';
     public usesGemini = true;
 

@@ -37,7 +37,13 @@ export interface Finding {
   description: string;
   severity: 'INFO' | 'LOW' | 'MEDIUM' | 'HIGH' | 'CRITICAL';
   confidence?: number; // 0.0 to 1.0
-  evidence?: string | string[];
+  evidence?: any;
+  verified?: boolean;
+  endpoint?: string;
+  parameter?: string;
+  payload?: string;
+  remediation?: string;
+  agent?: string;
 }
 
 export type ScanPhase = 'reconnaissance' | 'surface_mapping' | 'vulnerability_analysis' | 'verification';
