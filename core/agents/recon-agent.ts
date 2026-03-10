@@ -53,7 +53,12 @@ export class ReconAgent implements Agent {
         const crawlTelemetries = context.telemetry.filter(t => t.tool === 'web_crawler');
         const crawlCount = crawlTelemetries.filter(t => t.success).length;
 
-        // Flexible Coverage: If we have many endpoints, we can relax page requirements
+        // Populate queues for parallel workers
+        context.discoveredEndpoints.forEach(e => {
+            if (!context.discoveryQueue.includes(e)) context.discoveryQueue.push(e);
+        });
+
+        // Flexible Coverage
         const isCoverageSufficient = context.discoveredPages.length >= 3 ||
             (context.discoveredPages.length >= 1 && context.discoveredEndpoints.length >= 10);
 
@@ -70,16 +75,15 @@ export class ReconAgent implements Agent {
                     action: 'run_tool',
                     tool: 'web_crawler',
                     input: { target: nextLink || context.target },
-                    reasoning: `Coverage insufficient. Running crawler on ${nextLink || 'target root'}.`
+                    reasoning: `Parallel Discovery: Seeding discovery queue with ${nextLink || 'target root'}.`
                 };
             }
         }
 
-        // Done with initial recon, return control to Orchestrator
         return {
             action: 'delegate',
             nextAgent: 'OrchestratorAgent',
-            reasoning: 'Basic surface mapping complete. Handing off to deep discovery agents.'
+            reasoning: 'Initial surface mapping complete. Queues populated for parallel workers.'
         };
     }
 }

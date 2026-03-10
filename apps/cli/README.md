@@ -30,10 +30,12 @@ Alternatively, you can provide the key via:
 - `shipout scan <target>`: Start an autonomous scan. Target can be a URL or a file containing multiple URLs.
 - `shipout setup`: Enter your API key interactively.
 - `shipout doctor`: Diagnose your local environment and connectivity.
+- `shipout --concurrency=<num>`: Set parallel worker count (default: 5).
 - `shipout --help`: View all available options.
 
 ## Features
 
+- **Parallel Architecture**: High-speed concurrent scanning engine.
 - **Autonomous Brain**: Uses Gemini models to decide which security tools to run and when.
 - **Agent Architecture**: Features specialized agents for Recon, Surface Mapping, Secrets, and Verification.
 - **Stealthy & Efficient**: Intelligent tool selection reduces noise while increasing coverage.

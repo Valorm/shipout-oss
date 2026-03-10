@@ -11,6 +11,7 @@ export interface ScanBudget {
   maxTools: number;
   maxRequests: number;
   maxTime: number; // in milliseconds
+  concurrency?: number;
   debug?: boolean;
 }
 
@@ -76,6 +77,7 @@ export interface ScanContext {
   phase?: ScanPhase;
 
   // Budget Tracking
+  budget?: ScanBudget;
   toolsUsed: number;
   requestsMade: number;
   startTime: number;
@@ -114,6 +116,12 @@ export interface ScanContext {
   totalCost?: number;
   stagnationCounter: number;
   investigationMemory: Record<string, string[]>;
+
+  // Queues for Parallel Architecture
+  discoveryQueue: string[];      // Endpoints/URLs to be processed
+  parameterQueue: string[];      // Discovered parameters to be tested
+  findingsQueue: Finding[];      // Findings waiting for verification
+
   targetProfile?: {
     waf?: string;
     framework?: string;

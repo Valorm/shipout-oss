@@ -18,49 +18,41 @@ export class PayloadAgent implements Agent {
     ];
 
     public async decide(context: ScanContext): Promise<AgentDecision> {
-        const allEndpoints = context.discoveredEndpoints;
-        const fuzzedParams = context.investigationMemory['parameter_fuzzer'] || [];
+        // Support parallel worker pattern: use context.target if it's set specifically for this worker
+        // Otherwise pull from discoveryQueue
+        const currentTarget = context.target || (context.discoveryQueue.length > 0 ? context.discoveryQueue.shift() : null);
 
-        // Sort: Endpoints with '?' or known fuzzed params come first
-        const sortedEndpoints = [...allEndpoints].sort((a, b) => {
-            const aHasParam = a.includes('?') || fuzzedParams.some(p => a.includes(p));
-            const bHasParam = b.includes('?') || fuzzedParams.some(p => b.includes(p));
-            if (aHasParam && !bHasParam) return -1;
-            if (!aHasParam && bHasParam) return 1;
-            return 0;
-        });
-
-        if (sortedEndpoints.length === 0) {
+        if (!currentTarget) {
             return {
                 action: 'delegate',
                 nextAgent: 'OrchestratorAgent',
-                reasoning: 'No endpoints discovered yet for payload testing.'
+                reasoning: 'No endpoints in queue for payload testing.'
             };
         }
 
-        // Find the first tool/endpoint combination that hasn't been run yet
-        for (const endpoint of sortedEndpoints) {
-            for (const tool of this.toolsToRun) {
-                const alreadyRun = (context.investigationMemory[tool] || []).includes(endpoint);
-                if (!alreadyRun) {
-                    return {
-                        action: 'run_tool',
-                        tool: tool,
-                        reasoning: `Smart Fuzzing: ${endpoint} with ${tool.replace('_', ' ')}.`,
-                        input: {
-                            target: endpoint,
-                            contextParams: { baseUrl: context.target },
-                            metadata: { targetNode: `endpoint:${endpoint}` }
-                        }
-                    };
-                }
+        const fuzzedParams = context.investigationMemory['parameter_fuzzer'] || [];
+
+        // Find the first tool that hasn't been run yet for this target
+        for (const tool of this.toolsToRun) {
+            const alreadyRun = (context.investigationMemory[tool] || []).includes(currentTarget);
+            if (!alreadyRun) {
+                return {
+                    action: 'run_tool',
+                    tool: tool,
+                    reasoning: `Parallel Worker: Testing ${currentTarget} with ${tool.replace('_', ' ')}.`,
+                    input: {
+                        target: currentTarget,
+                        contextParams: { baseUrl: context.target },
+                        metadata: { targetNode: `endpoint:${currentTarget}` }
+                    }
+                };
             }
         }
 
         return {
             action: 'delegate',
             nextAgent: 'OrchestratorAgent',
-            reasoning: 'All prioritized endpoints have been tested with available payloads.'
+            reasoning: `All tests complete for ${currentTarget}.`
         };
     }
 }

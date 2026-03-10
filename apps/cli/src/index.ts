@@ -13,7 +13,7 @@ try {
     // ignore
 }
 
-import { AgentPlanner } from '../../../core/engine/planner';
+import { ParallelPlanner } from '../../../core/engine/parallel-planner';
 import { OrchestratorAgent } from '../../../core/agents/orchestrator-agent';
 import { ReconAgent } from '../../../core/agents/recon-agent';
 import { WebSecurityAgent } from '../../../core/agents/web-security-agent';
@@ -52,7 +52,7 @@ async function main() {
     const isJson = args.includes('--json');
 
     if (args.includes('--version') || args.includes('-v')) {
-        console.log(`Shipout Beta v0.1.10`);
+        console.log(`Shipout Beta v0.1.12`);
         return;
     }
 
@@ -144,6 +144,7 @@ Arguments:
 
 Options:
   --api-key=<key>       Directly provide the Gemini API key
+  --concurrency=<num>   Number of parallel workers (default: 5)
   --json                Output results in JSON format
   --debug               Enable verbose logging
 `);
@@ -154,12 +155,10 @@ async function runLiveScan(target: string, isDebug: boolean, isJson: boolean): P
     cliLogger.setSilent(isJson);
     cliLogger.start(target, 25);
 
-    const planner = new AgentPlanner({
-        maxTools: 25,
-        maxRequests: 200,
-        maxTime: 300000, // 5 minute timeout for live runs
-        debug: isDebug
-    }, toolExecutor, cliLogger);
+    const concurrencyFlag = process.argv.find(a => a.startsWith('--concurrency='))?.split('=')[1];
+    const concurrency = concurrencyFlag ? parseInt(concurrencyFlag) : 5;
+
+    const planner = new ParallelPlanner(toolExecutor, cliLogger);
 
     const orchestrator = new OrchestratorAgent();
     planner.registerAgent(new ReconAgent());
@@ -192,12 +191,22 @@ async function runLiveScan(target: string, isDebug: boolean, isJson: boolean): P
         agentsUsed: [],
         stagnationCounter: 0,
         investigationMemory: {},
+        discoveryQueue: [],
+        parameterQueue: [],
+        findingsQueue: [],
         attackGraph: { nodes: [], edges: [] },
-        telemetry: []
+        telemetry: [],
+        budget: {
+            maxTools: 25,
+            maxRequests: 200,
+            maxTime: 300000,
+            concurrency: concurrency,
+            debug: isDebug
+        }
     };
 
     try {
-        const finalContext = await planner.runInvestigateLoop(orchestrator, context);
+        const finalContext = await planner.runParallelInvestigate(orchestrator, context);
         cliLogger.logSummary(finalContext);
         return finalContext;
     } catch (e: any) {

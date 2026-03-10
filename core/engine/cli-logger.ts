@@ -14,6 +14,8 @@ export class CLILogger implements InvestigationLogger {
         'verification': 'Vulnerability Verification'
     };
 
+    private agentStatuses: Map<string, string> = new Map();
+
     constructor(debug: boolean = false) {
         this.debug = debug;
     }
@@ -28,8 +30,24 @@ export class CLILogger implements InvestigationLogger {
 
     async updateStatus(jobId: string, text: string, progress?: number): Promise<void> {
         if (this.silent) return;
+
+        // Extract agent name if present in brackets [AgentName]
+        const agentMatch = text.match(/^\[(.*?)\]/);
+        const agentName = agentMatch ? agentMatch[1] : 'Orchestrator';
+        const cleanText = text.replace(/^\[.*?\]\s*/, '');
+
+        this.agentStatuses.set(agentName, cleanText);
+
         if (this.debug) {
-            console.log(chalk.gray(`[Status] ${text} (${progress || 0}%)`));
+            console.log(chalk.gray(`[${agentName}] ${cleanText} (${progress || 0}%)`));
+        } else {
+            // In non-debug mode, we'll show a compact real-time update
+            // We'll use a single line for the "latest" high-priority agent action
+            if (agentName.includes('Worker') || agentName === 'PayloadAgent') {
+                process.stdout.write(chalk.dim(`\r      • Parallel Activity: ${chalk.yellow(agentName)} is ${cleanText.toLowerCase().slice(0, 40)}...          `));
+            } else {
+                console.log(`      ${chalk.dim('•')} ${chalk.bold(agentName)}: ${chalk.dim(cleanText)}`);
+            }
         }
     }
 

@@ -50,21 +50,34 @@ shipout scan https://target.com
 
 ## How Shipout Works
 
-Shipout uses an agent-driven investigation engine.
+Shipout uses a high-performance **Parallel Architecture**.
 
-Each scan is coordinated by an orchestrator agent that delegates tasks to specialized agents:
+Unlike traditional sequential scanners, Shipout coordinates multiple agents concurrently using an intelligent queue-driven engine:
 
 ```
-OrchestratorAgent
-│
-├─ ReconAgent
-├─ SurfaceExpansionAgent
-├─ PayloadAgent
-├─ WebSecurityAgent
-└─ VerifyAgent
+                Orchestrator
+                     │
+        ┌────────────┴────────────┐
+        │            │            │
+   Recon Lane   Surface Lane   Payload Workers
+        │            │            │
+   [Endpoints] → [Queues]  → [Active Probes]
 ```
 
-These agents dynamically select scanning tools based on discovered attack surfaces.
+### Specialized Agents
+
+- **ReconAgent**: Maps the initial surface and seeds the discovery queue.
+- **SurfaceExpansionAgent**: Deep mines JavaScript, historical URLs, and subdomains.
+- **PayloadAgent**: A pool of parallel workers that run active vulnerability probes (SQLi, XSS, SSRF).
+- **Passive Agents**: Continuous data leak and secret discovery monitoring.
+
+## 🛡️ Modern Web & SPA Scanning
+
+Shipout is built for modern Single Page Applications (SPA). It goes beyond simple HTML crawling by:
+- **JavaScript Route Discovery**: Support for Angular, React, and Vue routes.
+- **API Endpoint Extraction**: Deep regex mining of `.js` files for internal API paths.
+- **Parameter Discovery**: Fuzzing for hidden internal parameters.
+- **Form Security Audit**: Real-time analysis of CSRF and insecure form submissions.
 
 ## Architecture
 

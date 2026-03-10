@@ -54,15 +54,20 @@ export class SurfaceExpansionAgent implements Agent {
             return {
                 action: 'run_tool',
                 tool: 'parameter_fuzzer',
-                reasoning: `Testing ${nextEndpoint} for hidden internal parameters.`,
+                reasoning: `Parallel Discovery: Fuzzing ${nextEndpoint} for parameters.`,
                 input: { target: nextEndpoint }
             };
         }
 
+        // Sync local discovery back to shared queues
+        context.discoveredEndpoints.forEach(e => {
+            if (!context.discoveryQueue.includes(e)) context.discoveryQueue.push(e);
+        });
+
         return {
             action: 'delegate',
             nextAgent: 'OrchestratorAgent',
-            reasoning: 'Surface expansion phase complete. Passing to security audit.'
+            reasoning: 'Surface expansion phase complete. Queues synced for parallel workers.'
         };
     }
 }
