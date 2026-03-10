@@ -121,6 +121,8 @@ export interface ScanContext {
   discoveryQueue: string[];      // Endpoints/URLs to be processed
   parameterQueue: string[];      // Discovered parameters to be tested
   findingsQueue: Finding[];      // Findings waiting for verification
+  taskQueue: { type: string, target: string, data?: any }[]; // Central task queue
+  findingHashes: string[];       // To prevent duplicate findings
 
   targetProfile?: {
     waf?: string;
