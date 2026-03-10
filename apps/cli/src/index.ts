@@ -1,6 +1,8 @@
 #!/usr/bin/env node
 // Silence environment noise before any imports
 process.env.DOTENV_CONFIG_SILENT = 'true';
+process.env.DOTENV_SILENT = 'true';
+process.env.DOTENVX_SILENT = 'true';
 try {
     require('dotenv').config({ silent: true });
 } catch (e) {

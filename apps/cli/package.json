@@ -1,6 +1,6 @@
 {
     "name": "shipout",
-    "version": "0.1.1",
+    "version": "0.1.2",
     "bin": {
         "shipout": "./dist/apps/cli/src/index.js"
     },
