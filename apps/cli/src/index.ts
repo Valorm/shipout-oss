@@ -3,8 +3,12 @@
 process.env.DOTENV_CONFIG_SILENT = 'true';
 process.env.DOTENV_SILENT = 'true';
 process.env.DOTENVX_SILENT = 'true';
+process.env.DOTENV_TIP = 'false';
+process.env.DOTENVX_TIP = 'false';
 try {
-    require('dotenv').config({ silent: true });
+    if (require('fs').existsSync('.env')) {
+        require('dotenv').config({ silent: true });
+    }
 } catch (e) {
     // ignore
 }
@@ -28,7 +32,9 @@ import * as fs from 'fs';
 import { ConfigManager } from '../../../core/engine/config';
 import * as readline from 'readline';
 
-dotenv.config({ path: '.env' });
+if (fs.existsSync('.env')) {
+    dotenv.config({ path: '.env' });
+}
 
 const toolExecutor = new LocalExecutor();
 
