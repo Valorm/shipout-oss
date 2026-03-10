@@ -52,7 +52,7 @@ async function main() {
     const isJson = args.includes('--json');
 
     if (args.includes('--version') || args.includes('-v')) {
-        console.log(`Shipout Beta v0.0.8`);
+        console.log(`Shipout Beta v0.1.9`);
         return;
     }
 
