@@ -14,13 +14,14 @@ export class FormAnalysisAgent implements Agent {
             // Only scan HTML-like pages
             if (target.match(/\.(js|css|png|jpg|jpeg|gif|svg|woff|woff2|ttf|eot)$/i)) continue;
 
-            const alreadyScanned = context.telemetry.some(t => t.tool === 'form_security_analysis' && t.input.target === target);
+            const absoluteTarget = target.startsWith('http') ? target : new URL(target, context.target).toString();
+            const alreadyScanned = context.telemetry.some(t => t.tool === 'form_security_analysis' && t.input.target === absoluteTarget);
             if (!alreadyScanned) {
                 return {
                     action: 'run_tool',
                     tool: 'form_security_analysis',
                     reasoning: `Analyzing security posture of forms at ${target}`,
-                    input: { target }
+                    input: { target: absoluteTarget }
                 };
             }
         }

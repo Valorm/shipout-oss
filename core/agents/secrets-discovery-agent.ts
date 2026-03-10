@@ -23,13 +23,14 @@ export class SecretsDiscoveryAgent implements Agent {
         // Scan any newly discovered JS files
         for (const page of context.discoveredPages) {
             if (page.endsWith('.js')) {
-                const alreadyScanned = context.telemetry.some(t => t.tool === 'javascript_secret_scan' && t.input.target === page);
+                const absoluteTarget = page.startsWith('http') ? page : new URL(page, context.target).toString();
+                const alreadyScanned = context.telemetry.some(t => t.tool === 'javascript_secret_scan' && t.input.target === absoluteTarget);
                 if (!alreadyScanned) {
                     return {
                         action: 'run_tool',
                         tool: 'javascript_secret_scan',
                         reasoning: `Scanning discovered JavaScript file: ${page}`,
-                        input: { target: page, metadata: { targetNode: `file:${page}` } }
+                        input: { target: absoluteTarget, metadata: { targetNode: `file:${page}` } }
                     };
                 }
             }

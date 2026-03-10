@@ -27,7 +27,7 @@ export const DataLeakScanTool: Tool = {
                 const matches = content.match(regex);
                 if (matches) {
                     const uniqueMatches = [...new Set(matches)];
-                    findings.push(`MEDIUM: Potential ${type} leaked in response from ${target} (Found ${uniqueMatches.length} unique)`);
+                    findings.push(`MEDIUM: Potential ${type} leaked in response (Found ${uniqueMatches.length} unique)`);
                     leakDetails.push({
                         type,
                         count: uniqueMatches.length,

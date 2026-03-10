@@ -20,7 +20,8 @@ export class PayloadAgent implements Agent {
     public async decide(context: ScanContext): Promise<AgentDecision> {
         // Support parallel worker pattern: use context.target if it's set specifically for this worker
         // Otherwise pull from discoveryQueue
-        const currentTarget = context.target || (context.discoveryQueue.length > 0 ? context.discoveryQueue.shift() : null);
+        const rawTarget = context.target || (context.discoveryQueue.length > 0 ? context.discoveryQueue.shift() : null);
+        const currentTarget = rawTarget ? (rawTarget.startsWith('http') ? rawTarget : new URL(rawTarget, context.target).toString()) : null;
 
         if (!currentTarget) {
             return {

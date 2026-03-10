@@ -177,14 +177,14 @@ export class ParallelPlanner {
         if (result.findings?.length) {
             result.findings.forEach((f: string) => {
                 // Generate Fingerprint for Finding Deduplication
-                const hash = createHash('md5').update(`${toolName}:${f}`).digest('hex');
+                const hash = createHash('md5').update(f).digest('hex');
                 if (context.findingHashes.includes(hash)) return; // Skip Duplicate Finding
 
                 context.findingHashes.push(hash);
 
                 // Correct Severity Mapping (Metadata/Recon should be INFO)
                 let severity: Finding['severity'] = result.data?.severity || 'MEDIUM';
-                if (['http_probe', 'robots_explorer', 'sitemap_analyzer', 'subdomain_discovery', 'endpoint_discovery'].includes(toolName)) {
+                if (['http_probe', 'robots_explorer', 'sitemap_analyzer', 'subdomain_discovery', 'endpoint_discovery', 'historical_discovery'].includes(toolName)) {
                     if (!f.toLowerCase().includes('vulnerability') && !f.toLowerCase().includes('leak')) {
                         severity = 'INFO';
                     }
