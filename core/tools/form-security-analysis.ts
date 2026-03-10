@@ -12,32 +12,48 @@ export const FormSecurityAnalysisTool: Tool = {
             const html = await response.text();
 
             const findings: string[] = [];
+            const forms = html.match(/<form[\s\S]*?<\/form>/gi) || [];
 
-            // Check for HTTP forms
-            const httpFormMatch = html.match(/<form[^>]+action=["']http:\/\/[^"']+["']/gi);
-            if (httpFormMatch) {
-                findings.push(`Insecure Form: Form submits over HTTP at ${target}`);
-            }
+            forms.forEach((form, index) => {
+                const actionMatch = form.match(/action=["']([^"']+)["']/i);
+                const action = actionMatch ? actionMatch[1] : '';
+                const methodMatch = form.match(/method=["']([^"']+)["']/i);
+                const method = methodMatch ? methodMatch[1].toUpperCase() : 'GET';
 
-            // Check for potential missing CSRF
-            const hasForm = html.includes('<form');
-            const hasCsrf = /csrf|xsrf|token/gi.test(html);
-            if (hasForm && !hasCsrf) {
-                findings.push(`Missing CSRF Protection: No CSRF markers found in forms at ${target}`);
-            }
+                // 1. Insecure HTTP Submission
+                if (action.startsWith('http://') || (action === '' && target.startsWith('http://'))) {
+                    findings.push(`HIGH: Insecure Form Submission (HTTP) in form #${index + 1} at ${target}`);
+                }
 
-            // Check for unmasked password fields (type="text" for passwords)
-            const badPasswordMatch = html.match(/<input[^>]+name=["']password["'][^>]+type=["']text["']/gi);
-            if (badPasswordMatch) {
-                findings.push(`Insecure Password Field: Password input is not masked at ${target}`);
-            }
+                // 2. Missing CSRF Protection (heuristic)
+                // Look for common CSRF token patterns in hidden inputs or meta tags
+                const hasCsrfToken = /csrf|xsrf|token|_token|authenticity_token/i.test(form) ||
+                    /csrf-token|xsrf-token/i.test(html); // Check meta tags too
+
+                if (method === 'POST' && !hasCsrfToken) {
+                    findings.push(`MEDIUM: Potential Missing CSRF Protection in POST form #${index + 1} at ${target}`);
+                }
+
+                // 3. Unmasked Password Fields
+                const passwordFields = form.match(/<input[^>]+type=["']text["'][^>]+name=["']password["']/gi) ||
+                    form.match(/<input[^>]+name=["']password["'][^>]+type=["']text["']/gi);
+                if (passwordFields) {
+                    findings.push(`LOW: Unmasked Password Field in form #${index + 1} at ${target}`);
+                }
+
+                // 4. Sensitive data in GET forms
+                if (method === 'GET' && /password|token|secret|key/i.test(form)) {
+                    findings.push(`MEDIUM: Sensitive Data in GET Form (may leak in URLs) in form #${index + 1} at ${target}`);
+                }
+            });
 
             return {
                 findings,
                 requestsMade: 1,
                 data: {
-                    formsAnalyzed: (html.match(/<form/g) || []).length,
-                    threatsFound: findings.length
+                    formsAnalyzed: forms.length,
+                    threatsFound: findings.length,
+                    target
                 }
             };
         } catch (e: any) {

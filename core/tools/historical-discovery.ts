@@ -20,7 +20,13 @@ export const HistoricalDiscoveryTool: Tool = {
         const apiUrl = `https://web.archive.org/cdx/search/cdx?url=${domain}/*&output=json&fl=original&collapse=urlkey`;
 
         try {
-            const response = await fetch(apiUrl, { signal });
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 10000); // 10s timeout
+
+            const response = await fetch(apiUrl, {
+                signal: controller.signal
+            });
+            clearTimeout(timeout);
             if (!response.ok) {
                 return {
                     findings: [],

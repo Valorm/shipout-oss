@@ -20,10 +20,17 @@ export const WebCrawlerTool: Tool = {
 
             const pages: string[] = [];
             const endpoints: string[] = [];
+            const parameters: string[] = [];
 
             matches.forEach(link => {
                 try {
                     const url = new URL(link, target);
+
+                    // Collect parameters from URL
+                    url.searchParams.forEach((_, key) => {
+                        if (!parameters.includes(key)) parameters.push(key);
+                    });
+
                     // Only crawl same-origin links
                     if (url.origin !== baseUrl.origin) return;
 
@@ -38,14 +45,21 @@ export const WebCrawlerTool: Tool = {
                 }
             });
 
+            // Detect forms for hints
+            const hasForms = html.includes('<form');
+            const formCount = (html.match(/<form/g) || []).length;
+
             return {
                 findings: [
-                    `Discovered ${pages.length} potential pages and ${endpoints.length} other endpoints on ${target}`
+                    `Discovered ${pages.length} potential pages, ${endpoints.length} endpoints, and ${parameters.length} parameters on ${target}`
                 ],
                 requestsMade: 1,
                 data: {
-                    pages: pages.slice(0, 20),
-                    endpoints: endpoints.slice(0, 20),
+                    pages: pages.slice(0, 50),
+                    endpoints: endpoints.slice(0, 50),
+                    parameters: parameters,
+                    hasForms,
+                    formCount,
                     baseUrl: target
                 }
             };
