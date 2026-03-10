@@ -52,7 +52,7 @@ async function main() {
     const isJson = args.includes('--json');
 
     if (args.includes('--version') || args.includes('-v')) {
-        console.log(`Shipout Beta v0.1.12`);
+        console.log(`Shipout Beta v0.1.13`);
         return;
     }
 
@@ -194,6 +194,8 @@ async function runLiveScan(target: string, isDebug: boolean, isJson: boolean): P
         discoveryQueue: [],
         parameterQueue: [],
         findingsQueue: [],
+        taskQueue: [],
+        findingHashes: [],
         attackGraph: { nodes: [], edges: [] },
         telemetry: [],
         budget: {
