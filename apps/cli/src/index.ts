@@ -20,7 +20,9 @@ import { WebSecurityAgent } from '../../../core/agents/web-security-agent';
 import { SecretsAgent } from '../../../core/agents/secrets-agent';
 import { DependencyAgent } from '../../../core/agents/dependency-agent';
 import { PayloadAgent } from '../../../core/agents/payload-agent';
-import { VerifyAgent } from '../../../core/agents/verify-agent';
+import { VerificationAgent } from '../../../core/agents/verification-agent';
+import { ExploitSimulationAgent } from '../../../core/agents/exploit-simulation-agent';
+import { ReportAgent } from '../../../core/agents/report-agent';
 import { SurfaceExpansionAgent } from '../../../core/agents/surface-expansion-agent';
 import { ScanContext } from '../../../packages/shared/types/scan-context';
 import { availableTools } from '../../../core/tools';
@@ -163,7 +165,10 @@ async function runLiveScan(target: string, isDebug: boolean, isJson: boolean): P
     planner.registerAgent(new WebSecurityAgent());
     planner.registerAgent(new SecretsAgent());
     planner.registerAgent(new DependencyAgent());
-    planner.registerAgent(new VerifyAgent());
+    planner.registerAgent(new PayloadAgent());
+    planner.registerAgent(new VerificationAgent());
+    planner.registerAgent(new ExploitSimulationAgent());
+    planner.registerAgent(new ReportAgent());
 
     const context: ScanContext = {
         jobId: randomUUID(),
