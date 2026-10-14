@@ -1,0 +1,42 @@
+name: Shipout security scan
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+    inputs:
+      target:
+        description: "URL to scan (overrides the SHIPOUT_TARGET variable)"
+        required: false
+
+jobs:
+  scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install and build Shipout
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: Run Shipout scan
+        env:
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+        run: |
+          TARGET="${{ inputs.target }}"
+          if [ -z "$TARGET" ]; then TARGET="${{ vars.SHIPOUT_TARGET }}"; fi
+          if [ -z "$TARGET" ]; then
+            echo "No scan target set. Pass 'target' to workflow_dispatch or set the SHIPOUT_TARGET repository variable."
+            exit 1
+          fi
+          if [ -z "$GEMINI_API_KEY" ]; then
+            echo "GEMINI_API_KEY secret is not set. Add it in the repository settings."
+            exit 1
+          fi
+          npm run scan -- scan "$TARGET" --fail-on=high
