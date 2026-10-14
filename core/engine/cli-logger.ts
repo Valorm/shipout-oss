@@ -235,6 +235,11 @@ export class CLILogger implements InvestigationLogger {
                             }
                         }
 
+                        if (v.remediation) {
+                            console.log(`\n${chalk.bold('💡 How to fix it:')}`);
+                            console.log(chalk.green(v.remediation));
+                        }
+
                         if (v.agent) {
                             console.log(`\n${chalk.dim('Agent:')}`);
                             console.log(chalk.green(v.agent));

@@ -42,7 +42,7 @@ export const SQLiProbeTool: Tool = {
                         vulnerability: 'SQL Injection (Error-based)',
                         payload,
                         evidence: "Database syntax error detected in 500 response body.",
-                        remediation: "Use parameterized queries."
+                        remediation: "Never build a database query by joining user input into the query string. Use parameterized queries (prepared statements) so input is always treated as data, never as code. Example with node-postgres: db.query('SELECT * FROM users WHERE id = $1', [userId])."
                     };
                     break;
                 }
@@ -54,7 +54,7 @@ export const SQLiProbeTool: Tool = {
                         vulnerability: 'SQL Injection (Blind/Timing)',
                         payload,
                         evidence: `Response delay of ${duration}ms detected for timing payload.`,
-                        remediation: "Use parameterized queries."
+                        remediation: "Never build a database query by joining user input into the query string. Use parameterized queries (prepared statements) so input is always treated as data, never as code. Example with node-postgres: db.query('SELECT * FROM users WHERE id = $1', [userId])."
                     };
                     break;
                 }
