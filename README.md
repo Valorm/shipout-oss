@@ -1,58 +1,61 @@
 # Shipout
 
-AI-powered autonomous security scanner for modern web applications.
+You built your app with AI in a weekend. Shipout makes sure you do not ship it with the doors open.
 
-Shipout uses a team of specialized AI agents to perform reconnaissance, expand the attack surface, test vulnerabilities, and verify findings — similar to how a human security researcher investigates a target.
+Shipout is a security scanner made for people who build fast. Point it at your app and it checks for the vulnerabilities that AI generated code tends to ship with: exposed API keys sitting in your JavaScript bundle, SQL injection, cross site scripting, open redirects, server side request forgery, and more. Every finding comes with a plain language explanation of how to fix it, not just a severity label.
 
-Unlike traditional scanners that run isolated checks, Shipout performs multi-step investigations to uncover deeper security issues.
-
-## 🚀 Quick Start
-
-Run a scan immediately with `npx`:
+## Quick start
 
 ```bash
-npx shipout scan https://example.com
+npx shipout scan https://yourapp.com
 ```
 
-### First-Time Setup
-Shipout requires an AI model to run autonomous scans. To configure your Gemini API key:
+Shipout needs a Gemini API key to run its investigation agents. Create a free one at [Google AI Studio](https://aistudio.google.com/app/apikey), then:
 
 ```bash
 npx shipout setup
 ```
 
-1. Create a free Gemini API key: [Google AI Studio](https://aistudio.google.com/app/apikey)
-2. Run `shipout setup` and paste your key.
+And paste your key when asked.
 
-## Installation
-
-Install globally with npm:
+## Install it
 
 ```bash
 npm install -g shipout
+shipout scan https://yourapp.com
 ```
 
-Then run:
+## Commands
 
-```bash
-shipout scan https://target.com
-```
-
-## CLI Commands
-
-| Command              | Description                               |
+| Command              | What it does                              |
 | -------------------- | ----------------------------------------- |
-| `shipout scan <url>` | Run an autonomous security investigation  |
-| `shipout setup`      | Interactive configuration for API keys    |
-| `shipout doctor`     | Check environment readiness               |
-| `shipout --help`     | Show available commands                   |
-| `shipout --version`  | Show installed version                    |
+| `shipout scan <url>` | Scan an app and report what to fix        |
+| `shipout setup`      | Save your Gemini API key                  |
+| `shipout doctor`     | Check that your environment is ready      |
+| `shipout --help`     | Show all commands                         |
+| `shipout --version`  | Show the installed version                |
 
-## How Shipout Works
+Append `--json` to `scan` for machine readable output, or `--debug` to see everything the agents are doing.
 
-Shipout uses a high-performance **Parallel Architecture**.
+## What a finding looks like
 
-Unlike traditional sequential scanners, Shipout coordinates multiple agents concurrently using an intelligent queue-driven engine:
+```
+[HIGH] SQL Injection (Error-based) on parameter "id"
+
+Endpoint:
+https://yourapp.com/api/users
+
+How to fix it:
+Never build a database query by joining user input into the query string.
+Use parameterized queries (prepared statements) so input is always treated
+as data, never as code.
+```
+
+No security background required. If you can read the fix, you can apply it.
+
+## How it works
+
+Shipout sends a team of specialised AI agents at your app. One maps out every page, endpoint, and API route it can find, including routes hidden inside your JavaScript bundles. Others probe the app the way an attacker would, testing for injection flaws, leaked secrets, and misconfigurations. A final pass verifies each finding to cut down false alarms.
 
 ```
                 Orchestrator
@@ -64,54 +67,28 @@ Unlike traditional sequential scanners, Shipout coordinates multiple agents conc
    [Endpoints] → [Queues]  → [Active Probes]
 ```
 
-### Specialized Agents
+The agents:
 
 - **ReconAgent**: Maps the initial surface and seeds the discovery queue.
-- **SurfaceExpansionAgent**: Deep mines JavaScript, historical URLs, and subdomains.
-- **PayloadAgent**: A pool of parallel workers that run active vulnerability probes (SQLi, XSS, SSRF).
-- **Passive Agents**: Continuous data leak and secret discovery monitoring.
+- **SurfaceExpansionAgent**: Digs through JavaScript, historical URLs, and subdomains.
+- **PayloadAgent**: A pool of parallel workers running active vulnerability probes (SQLi, XSS, SSRF).
+- **Passive agents**: Continuous data leak and secret discovery monitoring.
 
-## 🛡️ Modern Web & SPA Scanning
+## Built for modern web apps
 
-Shipout is built for modern Single Page Applications (SPA). It goes beyond simple HTML crawling by:
-- **JavaScript Route Discovery**: Support for Angular, React, and Vue routes.
-- **API Endpoint Extraction**: Deep regex mining of `.js` files for internal API paths.
-- **Parameter Discovery**: Fuzzing for hidden internal parameters.
-- **Form Security Audit**: Real-time analysis of CSRF and insecure form submissions.
+Shipout is made for single page applications, which is what most AI built apps are. It goes beyond simple HTML crawling:
 
-## Architecture
+- **JavaScript route discovery**: Follows Angular, React, and Vue routes.
+- **API endpoint extraction**: Mines `.js` files for internal API paths.
+- **Parameter discovery**: Probes for hidden parameters.
+- **Form security audit**: Checks CSRF protection and insecure form submissions.
+- **Secret scanning**: Finds exposed API keys (AWS, Stripe, Firebase, and others) in your bundles.
 
-```
-CLI
- ↓
-Scan Engine
- ↓
-AI Agents
- ↓
-Tools
- ↓
-Results
-```
+## Run it before every deploy
 
-Shipout's core engine lives in the `core/` directory and is shared by both the CLI and the cloud platform.
+A GitHub Action is included in `.github/workflows/shipout-scan.yml`. Add your Gemini API key as a `GEMINI_API_KEY` secret and every push scans your staging URL before it reaches production.
 
-## Example Investigation Flow
-
-```
-Target Discovery
- ↓
-Endpoint Mapping
- ↓
-Parameter Discovery
- ↓
-Payload Testing
- ↓
-Vulnerability Verification
-```
-
-This allows Shipout to detect issues that single-pass scanners may miss.
-
-## Project Structure
+## Project structure
 
 ```
 apps/
@@ -148,8 +125,4 @@ MIT License
 
 ## Status
 
-Shipout is currently in early development and evolving rapidly.
-
-## Valorm Technologies
-
-Shipout is developed by Valorm Technologies.
+Shipout is in early development and evolving rapidly. It is built by Valorm Technologies.

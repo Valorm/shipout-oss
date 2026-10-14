@@ -52,7 +52,7 @@ async function main() {
     const isJson = args.includes('--json');
 
     if (args.includes('--version') || args.includes('-v')) {
-        console.log(`Shipout Beta v0.1.16`);
+        console.log(`Shipout v${getCliVersion()}`);
         return;
     }
 
@@ -119,6 +119,10 @@ async function main() {
         if (isJson) {
             console.log(JSON.stringify(results, null, 2));
         }
+
+        // --fail-on=<severity>: exit non-zero if any finding meets the threshold.
+        // Lets CI pipelines fail a build when Shipout finds something serious.
+        checkFailOn(results, args, isJson);
     } else if (command.startsWith('http')) {
         await runLiveScan(command, isDebug, isJson);
     } else {
@@ -145,6 +149,8 @@ Arguments:
 Options:
   --api-key=<key>       Directly provide the Gemini API key
   --concurrency=<num>   Number of parallel workers (default: 5)
+  --fail-on=<level>     Exit 1 if any finding is at or above this severity
+                        (info, low, medium, high, critical). Useful in CI.
   --json                Output results in JSON format
   --debug               Enable verbose logging
 `);
@@ -216,6 +222,43 @@ async function runLiveScan(target: string, isDebug: boolean, isJson: boolean): P
             console.error(`\n❌ Scan Failed for ${target}: ${e.message}`);
         }
         return null;
+    }
+}
+
+export function getCliVersion(): string {
+    // Resolves relative to this file. In the built package
+    // (dist/apps/cli/src) that is the cli package.json.
+    const candidates = ['../../../../package.json', '../../package.json'];
+    try {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const req: NodeRequire = require;
+        for (const c of candidates) {
+            try {
+                return req(c).version;
+            } catch { /* try next */ }
+        }
+    } catch { /* ESM dev runtime: no require */ }
+    return 'unknown';
+}
+
+export function checkFailOn(results: any[], args: string[], isJson: boolean): void {
+    const failOnFlag = args.find(a => a.startsWith('--fail-on='));
+    if (!failOnFlag) return;
+    const order = ['INFO', 'LOW', 'MEDIUM', 'HIGH', 'CRITICAL'];
+    const level = (failOnFlag.split('=')[1] || '').toUpperCase();
+    const threshold = order.indexOf(level);
+    if (threshold === -1) {
+        console.error(`\u274C Invalid --fail-on level: ${level}. Use one of: info, low, medium, high, critical.`);
+        process.exit(1);
+    }
+    const bad = results
+        .flatMap(r => r.vulnerabilities || [])
+        .filter(v => order.indexOf(v.severity) >= threshold);
+    if (bad.length > 0) {
+        if (!isJson) {
+            console.error(`\n\u274C Shipout found ${bad.length} finding(s) at ${level} severity or above.`);
+        }
+        process.exit(1);
     }
 }
 
