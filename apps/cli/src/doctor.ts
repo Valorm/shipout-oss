@@ -38,7 +38,8 @@ export async function runDoctor() {
 
     const fs = require('fs');
     const path = require('path');
-    const corePath = path.join(__dirname, '..', '..', 'core');
+    // From src: apps/cli/src -> repo root. From dist: dist/apps/cli/src -> dist.
+    const corePath = path.join(__dirname, '..', '..', '..', 'core');
     if (fs.existsSync(corePath)) {
         console.log('✅ Shipout Engine');
     } else {
