@@ -42,7 +42,7 @@ export const SSRFProbeTool: Tool = {
                             payload,
                             parameter: param,
                             evidence: "Internal metadata or service banner leaked in response.",
-                            remediation: "Implement a strict allowlist for outgoing requests and use a network proxy."
+                            remediation: "Never let your server fetch a URL that came straight from user input. Only allow requests to a fixed list of approved hosts, and block your server from reaching internal addresses such as localhost, 169.254.169.254 and other private IPs."
                         };
                         break;
                     }

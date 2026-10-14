@@ -43,7 +43,7 @@ export const OpenRedirectProbeTool: Tool = {
                             payload,
                             parameter: param,
                             evidence: `Response redirected to restricted URL: ${location}`,
-                            remediation: "Implement a safelist for redirect destinations or use indirect references."
+                            remediation: "Never redirect the user to a URL taken straight from input. Only redirect to pages on your own site from a fixed list (a safelist), or redirect via short codes that map to known pages on your server."
                         };
                         break;
                     }

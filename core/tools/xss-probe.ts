@@ -40,7 +40,7 @@ export const XSSProbeTool: Tool = {
                         vulnerability: 'Reflected XSS',
                         payload,
                         evidence: "Payload reflected unsanitized in the response body.",
-                        remediation: "Implement robust output encoding and Content Security Policy (CSP)."
+                        remediation: "Escape user input before it is rendered in the page so the browser treats it as text, not code. In React this is automatic unless you use dangerouslySetInnerHTML. As a second layer, send a Content-Security-Policy header that blocks inline scripts."
                     };
                     break;
                 }

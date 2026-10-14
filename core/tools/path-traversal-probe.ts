@@ -41,7 +41,7 @@ export const PathTraversalProbeTool: Tool = {
                             payload,
                             parameter: param,
                             evidence: "Sensitive system file content leaked in response.",
-                            remediation: "Use file identifiers (IDs) instead of paths, or strictly validate and canonicalize input."
+                            remediation: "Never let user input decide a file path directly. Look files up by ID instead (for example /files/123 rather than /files/../../etc/passwd), and strip any '..' or '/' sequences from input before using it in a path."
                         };
                         break;
                     }
