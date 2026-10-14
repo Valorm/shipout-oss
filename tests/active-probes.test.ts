@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeAll, afterAll } from 'vitest';
-import { SQLiProbeTool } from '../tools/sqli-probe';
-import { XSSProbeTool } from '../tools/xss-probe';
-import { PayloadAgent } from '../agents/payload-agent';
+import { SQLiProbeTool } from '../core/tools/sqli-probe';
+import { XSSProbeTool } from '../core/tools/xss-probe';
+import { PayloadAgent } from '../core/agents/payload-agent';
 import express from 'express';
 import { Server } from 'http';
 
@@ -39,7 +39,7 @@ describe('Real Probing Tests with Local Server', () => {
     it('SQLiProbeTool should detect real SQLi from local server', async () => {
         const result = await SQLiProbeTool.run({ target: `${baseUrl}/api/search` });
         expect(result.findings.length).toBeGreaterThan(0);
-        expect(result.data.vulnerability).toBe('SQL Injection');
+        expect(result.data.vulnerability).toContain('SQL Injection');
         expect(result.requestsMade).toBeGreaterThan(0);
     });
 
@@ -54,7 +54,7 @@ describe('Real Probing Tests with Local Server', () => {
 describe('PayloadAgent Logic', () => {
     it('should delegate to Orchestrator if no endpoints are discovered', async () => {
         const agent = new PayloadAgent();
-        const context: any = { discoveredEndpoints: [] };
+        const context: any = { target: '', discoveryQueue: [], investigationMemory: {} };
         const decision = await agent.decide(context);
         expect(decision.action).toBe('delegate');
         expect(decision.nextAgent).toBe('OrchestratorAgent');
@@ -62,18 +62,29 @@ describe('PayloadAgent Logic', () => {
 
     it('should iterate through tools for each endpoint', async () => {
         const agent = new PayloadAgent();
-        const context: any = { discoveredEndpoints: ['/api/v1', '/api/v2'] };
+        const context: any = {
+            target: 'https://example.com',
+            discoveryQueue: [],
+            investigationMemory: {},
+        };
 
-        let decision = await agent.decide(context);
-        expect(decision.action).toBe('run_tool');
-        expect(decision.tool).toBe('sqli_probe');
+        // Simulate the executor recording each completed tool run
+        const recordRun = (tool: string) => {
+            const runs = context.investigationMemory[tool] || [];
+            runs.push('https://example.com');
+            context.investigationMemory[tool] = runs;
+        };
 
-        decision = await agent.decide(context);
-        expect(decision.tool).toBe('xss_probe');
+        for (const expected of ['sqli_probe', 'xss_probe', 'open_redirect_probe', 'ssrf_probe', 'path_traversal_probe', 'payload_fuzz']) {
+            const decision = await agent.decide(context);
+            expect(decision.action).toBe('run_tool');
+            expect(decision.tool).toBe(expected);
+            recordRun(decision.tool);
+        }
 
-        // Skip ahead to payload_fuzz (the 6th tool)
-        for (let i = 0; i < 3; i++) await agent.decide(context);
-        decision = await agent.decide(context);
-        expect(decision.tool).toBe('payload_fuzz');
+        // All tools done for the target: hand back to the orchestrator
+        const done = await agent.decide(context);
+        expect(done.action).toBe('delegate');
+        expect(done.nextAgent).toBe('OrchestratorAgent');
     });
 });

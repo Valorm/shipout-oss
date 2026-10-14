@@ -1,6 +1,6 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
-import { OrchestratorAgent } from '../agents/orchestrator-agent';
-import { ScanContext } from '../shared/types/scan-context';
+import { OrchestratorAgent } from '../core/agents/orchestrator-agent';
+import { ScanContext } from '../packages/shared/types/scan-context';
 
 // Mock Gemini
 const mockGenerateContent = vi.fn();
@@ -39,7 +39,9 @@ describe('OrchestratorAgent', () => {
             vulnerabilities: [],
             detectedSecrets: [],
             attackGraph: { nodes: [], edges: [] },
-            telemetry: []
+            telemetry: [],
+            agentsUsed: [],
+            stagnationCounter: 0
         };
         mockGenerateContent.mockClear();
     });
