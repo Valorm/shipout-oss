@@ -25,6 +25,7 @@ func Run(target string) *ScanResult {
 		CheckStackTraces,
 		CheckXSS,
 		CheckHardcodedSecrets,
+		CheckPIILeakage,
 	}
 
 	var wg sync.WaitGroup
