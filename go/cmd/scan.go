@@ -23,8 +23,34 @@ func RunScan(target string, format string) {
 		}
 	}
 
+	// Drift detection: compare against last scan
+	if format != "sarif" {
+		if baseline, err := scanner.LoadBaseline(); err == nil {
+			drift := scanner.CompareDrift(result.Findings, baseline)
+			if len(drift.New) > 0 {
+				fmt.Printf("  NEW since last scan: %d finding(s)\n", len(drift.New))
+				for _, f := range drift.New {
+					fmt.Printf("    + [%s] %s\n", f.Severity, f.Description)
+				}
+				fmt.Println()
+			}
+			if len(drift.Fixed) > 0 {
+				fmt.Printf("  FIXED since last scan: %d finding(s)\n", len(drift.Fixed))
+				for _, f := range drift.Fixed {
+					fmt.Printf("    - [%s] %s\n", f.Severity, f.Description)
+				}
+				fmt.Println()
+			}
+			if len(drift.New) == 0 && len(drift.Fixed) == 0 {
+				fmt.Printf("  No changes since last scan.\n\n")
+			}
+		}
+		// Save current findings as new baseline
+		scanner.SaveBaseline(result.Findings)
+	}
+
 	if format == "sarif" {
-		output, err := result.ToSARIF("0.10.0")
+		output, err := result.ToSARIF("0.11.0")
 		if err != nil {
 			fmt.Printf("Error generating SARIF: %v\n", err)
 			os.Exit(1)
