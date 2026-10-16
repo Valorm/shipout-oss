@@ -85,12 +85,9 @@ async function main() {
     }
 
     if (command === 'scan') {
-        // AI key is optional. Without it, Shipout runs its deterministic
-        // security checks (headers, CORS, exposed files, secrets, forms).
-        // With a key, the AI orchestrator adds adaptive probing and reporting.
+        // AI mode is parked for now. Scans are fully deterministic.
         if (!process.env.GEMINI_API_KEY) {
-            console.log('ℹ️  No Gemini API key found. Running deterministic checks only.');
-            console.log('   Add one with `shipout setup` for AI-powered adaptive scanning.\n');
+            console.log('ℹ️  Running Shipout deterministic security checks.\n');
         }
 
         const target = args[1];

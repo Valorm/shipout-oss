@@ -1,3 +1,8 @@
+/**
+ * PARKED: AI orchestration is not wired into the scan flow. The parallel
+ * planner runs deterministic agent lanes directly and never calls decide().
+ * Kept for a future AI-assisted mode. Do not present as active.
+ */
 import { Agent, AgentDecision } from '../../packages/shared/types/agent';
 import { ScanContext } from '../../packages/shared/types/scan-context';
 import { GoogleGenerativeAI } from '@google/generative-ai';

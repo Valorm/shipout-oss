@@ -10,13 +10,7 @@ Shipout is a security scanner made for people who build fast. Point it at your a
 npx shipout scan https://yourapp.com
 ```
 
-Shipout needs a Gemini API key to run its investigation agents. Create a free one at [Google AI Studio](https://aistudio.google.com/app/apikey), then:
-
-```bash
-npx shipout setup
-```
-
-And paste your key when asked.
+No API key needed. Shipout runs its deterministic security checks out of the box.
 
 ## Install it
 
@@ -55,7 +49,7 @@ No security background required. If you can read the fix, you can apply it.
 
 ## How it works
 
-Shipout sends a team of specialised AI agents at your app. One maps out every page, endpoint, and API route it can find, including routes hidden inside your JavaScript bundles. Others probe the app the way an attacker would, testing for injection flaws, leaked secrets, and misconfigurations. A final pass verifies each finding to cut down false alarms.
+Shipout sends a team of specialised deterministic agents at your app. One maps out every page, endpoint, and API route it can find, including routes hidden inside your JavaScript bundles. Others probe the app the way an attacker would, testing for injection flaws, leaked secrets, and misconfigurations.
 
 ```
                 Orchestrator
@@ -86,7 +80,7 @@ Shipout is made for single page applications, which is what most AI built apps a
 
 ## Run it before every deploy
 
-A GitHub Action is included in `.github/workflows/shipout-scan.yml`. It needs two things that must be your own: your Gemini API key as a `GEMINI_API_KEY` repository secret, and your target URL as the `SHIPOUT_TARGET` repository variable (or passed to `workflow_dispatch`). Once both are set, every push scans your staging URL before it reaches production.
+A GitHub Action is included in `.github/workflows/shipout-scan.yml`. Set your target URL as the `SHIPOUT_TARGET` repository variable (or pass it to `workflow_dispatch`). Every push then scans your staging URL before it reaches production. No API key needed.
 
 ## Project structure
 

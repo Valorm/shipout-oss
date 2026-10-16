@@ -94,11 +94,17 @@ export class ParallelPlanner {
                 }
 
                 if (targetToTest) {
+                    // Resolve relative paths against the scan root before
+                    // handing to the agent. Overwriting target with a bare
+                    // path breaks URL resolution inside decide().
+                    const absoluteTarget = targetToTest.startsWith('http')
+                        ? targetToTest
+                        : new URL(targetToTest, context.target).toString();
                     // Keep executing on this target until agent is done with it
                     let isDoneWithTarget = false;
                     while (!isDoneWithTarget && this.isInvestigating(context)) {
                         const beforeTools = context.toolsUsed;
-                        await this.executeAgentCycle(agent, { ...context, target: targetToTest });
+                        await this.executeAgentCycle(agent, { ...context, target: absoluteTarget });
                         const afterTools = context.toolsUsed;
 
                         // If no new tool was run, the agent is likely done with this target
