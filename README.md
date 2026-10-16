@@ -44,6 +44,7 @@ Shipout runs deterministic security checks. No AI, no cloud, no data leaves your
 
 Checks include:
 - Security headers (CSP, HSTS, X-Frame-Options, and more)
+- Hardcoded secrets in JavaScript (AWS keys, GitHub tokens, Stripe keys, and more)
 - Exposed sensitive files (`.env`, `.git/config`, debug routes)
 - Reflected XSS probing
 - CORS misconfiguration
