@@ -13,8 +13,18 @@ import (
 func RunScan(target string, format string) {
 	result := scanner.Run(target)
 
+	// Apply .shipoutignore rules from current directory
+	rules := scanner.LoadIgnoreFile(".")
+	if len(rules) > 0 {
+		filtered, ignored := scanner.FilterFindings(result.Findings, rules)
+		result.Findings = filtered
+		if ignored > 0 {
+			fmt.Printf("  Ignored %d finding(s) via .shipoutignore\n\n", ignored)
+		}
+	}
+
 	if format == "sarif" {
-		output, err := result.ToSARIF("0.4.0")
+		output, err := result.ToSARIF("0.7.0")
 		if err != nil {
 			fmt.Printf("Error generating SARIF: %v\n", err)
 			os.Exit(1)
