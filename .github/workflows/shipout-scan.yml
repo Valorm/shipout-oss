@@ -26,8 +26,6 @@ jobs:
           npm run build
 
       - name: Run Shipout scan
-        env:
-          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
         run: |
           TARGET="${{ inputs.target }}"
           if [ -z "$TARGET" ]; then TARGET="${{ vars.SHIPOUT_TARGET }}"; fi
