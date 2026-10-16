@@ -1,0 +1,47 @@
+name: Release binaries
+
+# Builds standalone Shipout binaries and publishes them to GitHub Releases.
+# Trigger: push a version tag, e.g. git tag v0.2.0 && git push origin v0.2.0
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+
+      - name: Install and build
+        run: |
+          npm ci --no-audit --no-fund
+          npm run build
+
+      - name: Build standalone binaries
+        run: |
+          npx -y @yao-pkg/pkg apps/cli/dist/apps/cli/src/index.js \
+            --targets node20-linux-x64,node20-macos-x64,node20-macos-arm64,node20-win-x64 \
+            --output dist-bin/shipout
+          ls -la dist-bin/
+
+      - name: Publish GitHub Release
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          gh release create "$TAG" \
+            --title "Shipout $TAG" \
+            --notes "Standalone binaries. Download for your platform, no Node.js required." \
+            dist-bin/shipout-linux \
+            dist-bin/shipout-macos-x64 \
+            dist-bin/shipout-macos-arm64 \
+            dist-bin/shipout-win-x64.exe
