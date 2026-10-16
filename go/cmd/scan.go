@@ -24,7 +24,7 @@ func RunScan(target string, format string) {
 	}
 
 	if format == "sarif" {
-		output, err := result.ToSARIF("0.9.0")
+		output, err := result.ToSARIF("0.10.0")
 		if err != nil {
 			fmt.Printf("Error generating SARIF: %v\n", err)
 			os.Exit(1)
@@ -75,6 +75,11 @@ func RunScan(target string, format string) {
 	fmt.Printf("Requests: %d\n", result.RequestCount)
 	fmt.Printf("Vulnerabilities: %d\n", vulnCount)
 	fmt.Printf("Informational: %d\n", len(bySeverity[scanner.SeverityInfo]))
+
+	// Security score
+	score := scanner.CalculateScore(result.Findings)
+	grade := scanner.ScoreGrade(score)
+	fmt.Printf("\nSecurity Score: %d/100 (%s)\n", score, grade)
 
 	if len(bySeverity[scanner.SeverityCritical]) > 0 {
 		fmt.Printf("\nScan result: CRITICAL vulnerabilities detected.\n")
