@@ -24,7 +24,7 @@ func RunScan(target string, format string) {
 	}
 
 	if format == "sarif" {
-		output, err := result.ToSARIF("0.8.0")
+		output, err := result.ToSARIF("0.9.0")
 		if err != nil {
 			fmt.Printf("Error generating SARIF: %v\n", err)
 			os.Exit(1)

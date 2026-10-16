@@ -9,7 +9,7 @@ import (
 	"github.com/valorm/shipout/cmd"
 )
 
-const version = "0.8.0"
+const version = "0.9.0"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -49,10 +49,19 @@ func main() {
 
 	case "audit":
 		path := "."
-		if len(os.Args) > 2 {
-			path = os.Args[2]
+		history := false
+		for _, arg := range os.Args[2:] {
+			if arg == "--history" {
+				history = true
+			} else if !strings.HasPrefix(arg, "-") {
+				path = arg
+			}
 		}
-		cmd.RunAudit(path)
+		if history {
+			cmd.RunHistoryAudit(path)
+		} else {
+			cmd.RunAudit(path)
+		}
 
 	case "--version", "-v", "version":
 		fmt.Printf("shipout v%s\n", version)
@@ -95,6 +104,8 @@ Usage:
   shipout fix <url>    Scan and generate fix files
   shipout init         Scaffold Shipout into this project
   shipout audit [path] Audit local dependencies for known vulnerabilities
+  shipout audit --history
+                         Scan git history for secrets
   shipout --version    Show version
   shipout --help       Show this message
 
