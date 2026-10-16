@@ -56,6 +56,10 @@ $ shipout audit
 
 `shipout init` installs a `.git/hooks/pre-commit` hook that runs `shipout audit` before each commit. Commits are blocked if known vulnerabilities are found. Bypass with `git commit --no-verify`.
 
+### Git history audit
+
+`shipout audit --history` scans every commit in your git history for hardcoded secrets. Secrets in history are forever, even if removed from current code. Rotate any findings immediately.
+
 ### Ignoring findings
 
 Create a `.shipoutignore` file in your project directory to suppress accepted risks or false positives. One rule per line:
