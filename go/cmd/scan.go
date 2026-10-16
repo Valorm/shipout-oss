@@ -10,10 +10,26 @@ import (
 )
 
 // RunScan executes a security scan against the target
-func RunScan(target string) {
-	fmt.Printf("\n  Shipout Security Scan\n  Target: %s\n\n", target)
-
+func RunScan(target string, format string) {
 	result := scanner.Run(target)
+
+	if format == "sarif" {
+		output, err := result.ToSARIF("0.4.0")
+		if err != nil {
+			fmt.Printf("Error generating SARIF: %v\n", err)
+			os.Exit(1)
+		}
+		fmt.Println(output)
+		// Exit 1 if critical findings for CI
+		for _, f := range result.Findings {
+			if f.Severity == scanner.SeverityCritical {
+				os.Exit(1)
+			}
+		}
+		return
+	}
+
+	fmt.Printf("\n  Shipout Security Scan\n  Target: %s\n\n", target)
 
 	// Group by severity
 	bySeverity := map[scanner.Severity][]scanner.Finding{}

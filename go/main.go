@@ -9,7 +9,7 @@ import (
 	"github.com/valorm/shipout/cmd"
 )
 
-const version = "0.3.0"
+const version = "0.4.0"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -23,11 +23,17 @@ func main() {
 	case "scan":
 		if len(os.Args) < 3 {
 			fmt.Println("Error: scan requires a target URL.")
-			fmt.Println("Usage: shipout scan <url>")
+			fmt.Println("Usage: shipout scan <url> [--format=sarif]")
 			os.Exit(1)
 		}
 		target := validateTarget(os.Args[2])
-		cmd.RunScan(target)
+		format := ""
+		for _, arg := range os.Args[3:] {
+			if arg == "--format=sarif" {
+				format = "sarif"
+			}
+		}
+		cmd.RunScan(target, format)
 
 	case "fix":
 		if len(os.Args) < 3 {
@@ -50,7 +56,7 @@ func main() {
 	default:
 		// Bare URL = scan it
 		if len(command) > 4 && (command[:4] == "http") {
-			cmd.RunScan(validateTarget(command))
+			cmd.RunScan(validateTarget(command), "")
 			return
 		}
 		fmt.Printf("Unknown command: %s\n\n", command)
