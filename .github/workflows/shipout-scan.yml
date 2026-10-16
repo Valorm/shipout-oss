@@ -35,8 +35,4 @@ jobs:
             echo "No scan target set. Pass 'target' to workflow_dispatch or set the SHIPOUT_TARGET repository variable."
             exit 1
           fi
-          if [ -z "$GEMINI_API_KEY" ]; then
-            echo "GEMINI_API_KEY secret is not set. Add it in the repository settings."
-            exit 1
-          fi
           npm run scan -- scan "$TARGET" --fail-on=high
