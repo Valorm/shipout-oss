@@ -9,7 +9,7 @@ import (
 	"github.com/valorm/shipout/cmd"
 )
 
-const version = "0.5.0"
+const version = "0.6.0"
 
 func main() {
 	if len(os.Args) < 2 {
@@ -46,6 +46,13 @@ func main() {
 
 	case "init":
 		cmd.RunInit()
+
+	case "audit":
+		path := "."
+		if len(os.Args) > 2 {
+			path = os.Args[2]
+		}
+		cmd.RunAudit(path)
 
 	case "--version", "-v", "version":
 		fmt.Printf("shipout v%s\n", version)
@@ -87,6 +94,7 @@ Usage:
   shipout scan <url>   Run a security scan
   shipout fix <url>    Scan and generate fix files
   shipout init         Scaffold Shipout into this project
+  shipout audit [path] Audit local dependencies for known vulnerabilities
   shipout --version    Show version
   shipout --help       Show this message
 
