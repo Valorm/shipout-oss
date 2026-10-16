@@ -1,15 +1,19 @@
 name: Release binaries
 
+
 # Builds standalone Shipout Go binaries and publishes them to GitHub Releases.
 # Trigger: push a version tag, e.g. git tag v0.3.0 && git push origin v0.3.0
+
 
 on:
   push:
     tags:
       - 'v*'
 
+
 permissions:
   contents: write
+
 
 jobs:
   release:
@@ -17,9 +21,11 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+
       - uses: actions/setup-go@v5
         with:
           go-version: '1.21'
+
 
       - name: Build Go binaries
         working-directory: go
@@ -30,12 +36,10 @@ jobs:
           GOOS=windows GOARCH=amd64 go build -o ../dist-bin/shipout-win-x64.exe .
           ls -la ../dist-bin/
 
-      - name: Publish GitHub Release
+
+      - name: Upload binaries to release
         env:
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TAG="${GITHUB_REF#refs/tags/}"
-          gh release create "$TAG" \
-            --title "Shipout $TAG" \
-            --notes "Standalone Go binaries. Download for your platform, no runtime required." \
-            dist-bin/*
+          gh release upload "$TAG" dist-bin/* --clobber
