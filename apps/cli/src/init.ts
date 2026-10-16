@@ -1,5 +1,5 @@
 /**
- * shipout init — Plutonium-style generator.
+ * shipout init — project scaffolding generator.
  *
  * Scaffolds Shipout security into a project: a shipout.config.json
  * declaration, a GitHub Actions workflow, and prints the remaining
