@@ -86,7 +86,7 @@ Shipout is made for single page applications, which is what most AI built apps a
 
 ## Run it before every deploy
 
-A GitHub Action is included in `.github/workflows/shipout-scan.yml`. Add your Gemini API key as a `GEMINI_API_KEY` secret and every push scans your staging URL before it reaches production.
+A GitHub Action is included in `.github/workflows/shipout-scan.yml`. It needs two things that must be your own: your Gemini API key as a `GEMINI_API_KEY` repository secret, and your target URL as the `SHIPOUT_TARGET` repository variable (or passed to `workflow_dispatch`). Once both are set, every push scans your staging URL before it reaches production.
 
 ## Project structure
 
