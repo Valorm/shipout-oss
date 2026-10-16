@@ -52,6 +52,10 @@ $ shipout audit
   GHSA-4xc9-xhrj-v574: Prototype pollution in lodash
 ```
 
+### Pre-commit hook
+
+`shipout init` installs a `.git/hooks/pre-commit` hook that runs `shipout audit` before each commit. Commits are blocked if known vulnerabilities are found. Bypass with `git commit --no-verify`.
+
 ### Ignoring findings
 
 Create a `.shipoutignore` file in your project directory to suppress accepted risks or false positives. One rule per line:
