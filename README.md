@@ -52,6 +52,20 @@ $ shipout audit
   GHSA-4xc9-xhrj-v574: Prototype pollution in lodash
 ```
 
+### Ignoring findings
+
+Create a `.shipoutignore` file in your project directory to suppress accepted risks or false positives. One rule per line:
+
+```
+# Ignore CORS on the API subdomain (intentional)
+cors:api.example.com
+
+# Accept the risk on missing headers, tracking in JIRA-123
+header_analysis
+```
+
+The scan automatically applies these rules and reports how many findings were ignored.
+
 ## How it works
 
 Shipout runs deterministic security checks. No AI, no cloud, no data leaves your machine except the HTTP requests to your target.
