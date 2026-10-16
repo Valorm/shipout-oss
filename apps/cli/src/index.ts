@@ -44,6 +44,7 @@ const toolExecutor = new LocalExecutor();
 
 
 import { runDoctor } from './doctor';
+import { runInit } from './init';
 
 async function main() {
     const args = process.argv.slice(2);
@@ -75,6 +76,11 @@ async function main() {
 
     if (command === 'doctor') {
         await runDoctor();
+        return;
+    }
+
+    if (command === 'init') {
+        await runInit(args);
         return;
     }
 
@@ -138,6 +144,7 @@ Shipout CLI - Autonomous Security Engine
 
 Usage:
   shipout scan <target> Run an autonomous security scan
+  shipout init          Scaffold Shipout security into this project
   shipout setup         Configure your Gemini API key
   shipout doctor        Check your environment for readiness
   shipout --version     Show version
@@ -145,6 +152,12 @@ Usage:
 
 Arguments:
   target                A URL or a path to a file containing a list of URLs
+
+Init options:
+  --target=<url>        URL to scan (skips the prompt)
+  --fail-on=<level>     Fail the build at this severity (skips the prompt)
+  --force               Overwrite existing generated files
+  --yes, -y             Accept defaults for everything not passed as flags
 
 Options:
   --api-key=<key>       Directly provide the Gemini API key
