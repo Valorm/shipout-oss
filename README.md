@@ -78,6 +78,7 @@ The scan automatically applies these rules and reports how many findings were ig
 
 Shipout runs deterministic security checks. No AI, no cloud, no data leaves your machine except the HTTP requests to your target.
 
+Every scan ends with a security score (0-100) and letter grade: A+ (95+), A (90+), B (80+), C (70+), D (60+), F (below 60). Scores are weighted by severity.
 Checks include:
 - Security headers (CSP, HSTS, X-Frame-Options, and more)
 - Hardcoded secrets in JavaScript (AWS keys, GitHub tokens, Stripe keys, and more)
