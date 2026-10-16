@@ -25,6 +25,7 @@ chmod +x shipout-linux-x64
 | ---------------------------------- | --------------------------------------------------- |
 | `shipout scan <url>`               | Scan a target and report findings                   |
 | `shipout scan <url> --format=sarif` | Scan and output SARIF 2.1.0 JSON for GitHub code scanning |
+| `shipout audit [path]`          | Audit local dependencies for known vulnerabilities      |
 | `shipout fix <url>`                | Scan and generate fix files for your framework      |
 | `shipout init`                     | Scaffold Shipout config and CI workflow into a project |
 
@@ -37,6 +38,19 @@ shipout scan https://myapp.com --format=sarif > results.sarif
 ```
 
 Severity mapping: CRITICAL and HIGH become `error`, MEDIUM becomes `warning`, LOW and INFO become `note`.
+
+### Dependency audit
+
+`shipout audit` scans your local `package-lock.json` (or `package.json`) against the OSV vulnerability database. No API key required.
+
+```
+$ shipout audit
+  Shipout Dependency Audit
+  Scanning 142 packages...
+
+  [HIGH] lodash@4.17.20
+  GHSA-4xc9-xhrj-v574: Prototype pollution in lodash
+```
 
 ## How it works
 
