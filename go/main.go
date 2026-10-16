@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"net/url"
 	"os"
+	"strings"
 
 	"github.com/valorm/shipout/cmd"
 )
@@ -24,7 +26,8 @@ func main() {
 			fmt.Println("Usage: shipout scan <url>")
 			os.Exit(1)
 		}
-		cmd.RunScan(os.Args[2])
+		target := validateTarget(os.Args[2])
+		cmd.RunScan(target)
 
 	case "fix":
 		if len(os.Args) < 3 {
@@ -32,7 +35,8 @@ func main() {
 			fmt.Println("Usage: shipout fix <url>")
 			os.Exit(1)
 		}
-		cmd.RunFix(os.Args[2])
+		target := validateTarget(os.Args[2])
+		cmd.RunFix(target)
 
 	case "init":
 		cmd.RunInit()
@@ -46,13 +50,28 @@ func main() {
 	default:
 		// Bare URL = scan it
 		if len(command) > 4 && (command[:4] == "http") {
-			cmd.RunScan(command)
+			cmd.RunScan(validateTarget(command))
 			return
 		}
 		fmt.Printf("Unknown command: %s\n\n", command)
 		printHelp()
 		os.Exit(1)
 	}
+}
+
+// validateTarget ensures the target is a valid http(s) URL
+func validateTarget(raw string) string {
+	raw = strings.TrimSpace(raw)
+	if raw == "" {
+		fmt.Println("Error: target URL cannot be empty.")
+		os.Exit(1)
+	}
+	u, err := url.Parse(raw)
+	if err != nil || (u.Scheme != "http" && u.Scheme != "https") || u.Host == "" {
+		fmt.Printf("Error: %q is not a valid http(s) URL.\n", raw)
+		os.Exit(1)
+	}
+	return strings.TrimSuffix(raw, "/")
 }
 
 func printHelp() {
