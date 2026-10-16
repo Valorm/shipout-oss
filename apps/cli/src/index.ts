@@ -25,6 +25,7 @@ import { PayloadAgent } from '../../../core/agents/payload-agent';
 import { VerificationAgent } from '../../../core/agents/verification-agent';
 import { ExploitSimulationAgent } from '../../../core/agents/exploit-simulation-agent';
 import { ReportAgent } from '../../../core/agents/report-agent';
+import { detectFramework, generateFixes, writeFixes } from './fix';
 import { SurfaceExpansionAgent } from '../../../core/agents/surface-expansion-agent';
 import { ScanContext } from '../../../packages/shared/types/scan-context';
 import { availableTools } from '../../../core/tools';
@@ -84,6 +85,11 @@ async function main() {
         return;
     }
 
+    if (command === 'fix') {
+        await runFix(args);
+        return;
+    }
+
     if (command === 'scan') {
         // AI mode is parked for now. Scans are fully deterministic.
         if (!process.env.GEMINI_API_KEY) {
@@ -132,7 +138,8 @@ function showHelp() {
 Shipout CLI - Autonomous Security Engine
 
 Usage:
-  shipout scan <target> Run an autonomous security scan
+  shipout scan <target> Run a security scan
+  shipout fix <target>  Scan and generate fix files for the findings
   shipout init          Scaffold Shipout security into this project
   shipout setup         Configure your Gemini API key
   shipout doctor        Check your environment for readiness
@@ -156,6 +163,38 @@ Options:
   --json                Output results in JSON format
   --debug               Enable verbose logging
 `);
+}
+
+async function runFix(args: string[]): Promise<void> {
+    const target = args[1];
+    if (!target) {
+        console.error('❌ Error: fix requires a target URL.');
+        console.log('Usage: shipout fix <url>');
+        process.exit(1);
+    }
+
+    console.log('🔍 Scanning for issues to fix...\n');
+    const context = await runLiveScan(target, false, true);
+    if (!context || context.vulnerabilities.length === 0) {
+        console.log('✅ No fixable issues found.');
+        return;
+    }
+
+    const projectDir = process.cwd();
+    const framework = detectFramework(projectDir);
+    console.log(`\n📦 Detected framework: ${framework}`);
+
+    const fixes = generateFixes(context.vulnerabilities, framework);
+    if (fixes.length === 0) {
+        console.log('No automatic fixes available for these findings.');
+        return;
+    }
+
+    const outDir = `${projectDir}/shipout-fixes`;
+    const written = writeFixes(fixes, outDir);
+    console.log(`\n🔧 Generated ${fixes.length} fix files in ./shipout-fixes/:`);
+    for (const f of written) console.log(`   - ${f}`);
+    console.log('\nReview each file, adapt to your codebase, then delete the directory.');
 }
 
 async function runLiveScan(target: string, isDebug: boolean, isJson: boolean): Promise<ScanContext | null> {
