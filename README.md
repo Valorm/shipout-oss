@@ -21,11 +21,22 @@ chmod +x shipout-linux-x64
 
 ## Commands
 
-| Command              | What it does                                        |
-| -------------------- | --------------------------------------------------- |
-| `shipout scan <url>` | Scan a target and report findings                   |
-| `shipout fix <url>`  | Scan and generate fix files for your framework      |
-| `shipout init`       | Scaffold Shipout config and CI workflow into a project |
+| Command                            | What it does                                        |
+| ---------------------------------- | --------------------------------------------------- |
+| `shipout scan <url>`               | Scan a target and report findings                   |
+| `shipout scan <url> --format=sarif` | Scan and output SARIF 2.1.0 JSON for GitHub code scanning |
+| `shipout fix <url>`                | Scan and generate fix files for your framework      |
+| `shipout init`                     | Scaffold Shipout config and CI workflow into a project |
+
+### SARIF output
+
+Use `--format=sarif` to get SARIF 2.1.0 JSON output. Pipe it to a file and upload it to GitHub code scanning to see findings as inline PR annotations:
+
+```
+shipout scan https://myapp.com --format=sarif > results.sarif
+```
+
+Severity mapping: CRITICAL and HIGH become `error`, MEDIUM becomes `warning`, LOW and INFO become `note`.
 
 ## How it works
 
