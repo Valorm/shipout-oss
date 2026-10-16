@@ -26,6 +26,7 @@ chmod +x shipout-linux-x64
 | `shipout scan <url>`               | Scan a target and report findings                   |
 | `shipout scan <url> --format=sarif` | Scan and output SARIF 2.1.0 JSON for GitHub code scanning |
 | `shipout audit [path]`          | Audit local dependencies for known vulnerabilities      |
+| `shipout review [path] [--fix]` | Review JS/TS source for reliability issues (HTTP calls without timeouts), with optional fix files |
 | `shipout fix <url>`                | Scan and generate fix files for your framework      |
 | `shipout init`                     | Scaffold Shipout config and CI workflow into a project |
 
@@ -91,6 +92,7 @@ Checks include:
 - Cookie security flags
 - Supabase service role key exposure
 - Stack trace and error message leakage
+- HTTP requests without timeouts (source review: `shipout review`)
 
 `shipout fix` detects your framework (Express, Next.js, Fastify, Koa) and generates ready to use fix files.
 

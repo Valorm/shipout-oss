@@ -93,3 +93,51 @@ func TestGenerateNoFixesForInfo(t *testing.T) {
 		t.Errorf("Generate() should produce cors-config.js for CORS info findings")
 	}
 }
+
+func TestGenerateTimeoutFix(t *testing.T) {
+	findings := []scanner.Finding{
+		{Type: "missing_timeout", Description: "HTTP request without a timeout", Severity: scanner.SeverityMedium},
+	}
+
+	for _, fw := range []Framework{FrameworkExpress, FrameworkNextJS, FrameworkFastify, FrameworkKoa, FrameworkNode} {
+		fixes := Generate(findings, fw)
+		if len(fixes) != 1 {
+			t.Fatalf("[%s] Generate() returned %d fixes, want 1", fw, len(fixes))
+		}
+		if fixes[0].Filename != "timeout-helper.js" {
+			t.Errorf("[%s] Filename = %q, want timeout-helper.js", fw, fixes[0].Filename)
+		}
+		if !contains(fixes[0].Content, "AbortSignal.timeout") {
+			t.Errorf("[%s] fix content missing AbortSignal.timeout helper", fw)
+		}
+	}
+
+	// Express gets server timeout wiring, Next.js does not
+	expressFixes := Generate(findings, FrameworkExpress)
+	if !contains(expressFixes[0].Content, "server.setTimeout") {
+		t.Errorf("express fix missing server.setTimeout wiring")
+	}
+	nextFixes := Generate(findings, FrameworkNextJS)
+	if !contains(nextFixes[0].Content, "route.js") {
+		t.Errorf("nextjs fix missing route handler guidance")
+	}
+
+	// No timeout findings: no timeout fix file
+	other := []scanner.Finding{
+		{Type: "header_analysis", Description: "x", Severity: scanner.SeverityMedium},
+	}
+	for _, f := range Generate(other, FrameworkExpress) {
+		if f.Filename == "timeout-helper.js" {
+			t.Errorf("timeout fix generated without missing_timeout findings")
+		}
+	}
+}
+
+func contains(s, sub string) bool {
+	for i := 0; i+len(sub) <= len(s); i++ {
+		if s[i:i+len(sub)] == sub {
+			return true
+		}
+	}
+	return false
+}
