@@ -117,6 +117,7 @@ export class ParallelPlanner {
 
     private async runPassiveLane(context: ScanContext) {
         const passiveAgents = [
+            'WebSecurityAgent',
             'SecretsDiscoveryAgent',
             'DataLeakAgent',
             'FormAnalysisAgent'
@@ -249,6 +250,8 @@ export class ParallelPlanner {
         if (context.state !== 'investigating') return false;
         if (this.totalSteps >= this.MAX_TOTAL_STEPS) return false;
         if (context.toolsUsed >= (context.budget?.maxTools || 50)) return false;
+        const maxTime = context.budget?.maxTime || 300000;
+        if (Date.now() - context.startTime >= maxTime) return false;
         return true;
     }
 

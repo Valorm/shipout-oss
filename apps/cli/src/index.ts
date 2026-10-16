@@ -85,20 +85,12 @@ async function main() {
     }
 
     if (command === 'scan') {
-        // Check for API Key before scanning
+        // AI key is optional. Without it, Shipout runs its deterministic
+        // security checks (headers, CORS, exposed files, secrets, forms).
+        // With a key, the AI orchestrator adds adaptive probing and reporting.
         if (!process.env.GEMINI_API_KEY) {
-            console.log('❌ Gemini API key not found.\n');
-            console.log('Shipout requires an AI model to run autonomous scans.');
-            console.log('Create one here: https://aistudio.google.com/app/apikey\n');
-
-            const wantSetup = await promptQuestion('Would you like to set it up now? (y/n): ');
-            if (wantSetup.toLowerCase() === 'y') {
-                await runSetup();
-                // After setup, the key should be in process.env
-            } else {
-                console.log('Please set GEMINI_API_KEY in your environment or use --api-key flag.');
-                process.exit(1);
-            }
+            console.log('ℹ️  No Gemini API key found. Running deterministic checks only.');
+            console.log('   Add one with `shipout setup` for AI-powered adaptive scanning.\n');
         }
 
         const target = args[1];
