@@ -8,6 +8,17 @@ export class SecretsDiscoveryAgent implements Agent {
 
     public async decide(context: ScanContext): Promise<AgentDecision> {
 
+        // Probe common sensitive paths (/.env, /debug, /.git/config, ...)
+        const hasFileProbe = context.telemetry.some(t => t.tool === 'sensitive_file_probe' && t.input.target === context.target);
+        if (!hasFileProbe) {
+            return {
+                action: 'run_tool',
+                tool: 'sensitive_file_probe',
+                reasoning: 'Probing common sensitive paths for exposed secrets and config.',
+                input: { target: context.target, metadata: { targetNode: 'root' } }
+            };
+        }
+
         // In v1.7, we scan the root and any important discovered JS files
         const hasRootScan = context.telemetry.some(t => t.tool === 'javascript_secret_scan' && t.input.target === context.target);
 

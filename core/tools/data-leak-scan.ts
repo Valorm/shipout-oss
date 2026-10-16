@@ -6,43 +6,59 @@ export const DataLeakScanTool: Tool = {
 
     async run(input: ToolInput, signal?: AbortSignal): Promise<ToolOutput> {
         const { target } = input;
+        const findings: string[] = [];
+        const leakDetails: any[] = [];
+        let requestsMade = 0;
 
-        try {
-            const response = await fetch(target, { signal });
-            const content = await response.text();
+        const patterns = {
+            'Email Address': /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
+            'Internal ID': /(?:user_id|account_id|internal_id|uid|id)["']?\s*[:=]\s*["']?([0-9a-fA-F-]{8,36}|[0-9]{5,})["']?/gi,
+            'Auth Token': /(?:Bearer|Token|auth|access_token|session_id)\s*[:=]?\s*["']?([0-9a-zA-Z._-]{32,})["']?/gi,
+            'JWT Token': /eyJ[a-zA-Z0-9_-]{10,}\.eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/g,
+            'API Key': /(?:api_key|apikey|secret_key|app_secret|client_secret)["']?\s*[:=]\s*["']?([a-zA-Z0-9._-]{20,})["']?/gi,
+            'Server Path': /(?:\/[a-zA-Z0-9._-]+){3,}/g,
+            'Stack Trace': /(?:at\s+\S+\s*\(.+?:\d+:\d+\)|Traceback\s*\(most recent call last\)|#[0-9]+\s+\S+\(.+?:\d+\))/g,
+        };
 
-            const patterns = {
-                'Email Address': /[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g,
-                'Internal ID': /(?:user_id|account_id|internal_id|uid|id)["']?\s*[:=]\s*["']?([0-9a-fA-F-]{8,36}|[0-9]{5,})["']?/gi,
-                'Auth Token': /(?:Bearer|Token|auth|access_token|session_id)\s*[:=]?\s*["']?([0-9a-zA-Z._-]{32,})["']?/gi,
-                'JWT Token': /eyJ[a-zA-Z0-9_-]{10,}\.eyJ[a-zA-Z0-9_-]{10,}\.[a-zA-Z0-9_-]{10,}/g,
-                'API Key': /(?:api_key|apikey|secret_key|app_secret|client_secret)["']?\s*[:=]\s*["']?([a-zA-Z0-9._-]{20,})["']?/gi,
-                'Server Path': /(?:\/[a-zA-Z0-9._-]+){3,}/g
-            };
-
-            const findings: string[] = [];
-            const leakDetails: any[] = [];
-
+        const scanContent = (content: string, label: string) => {
             for (const [type, regex] of Object.entries(patterns)) {
                 const matches = content.match(regex);
                 if (matches) {
                     const uniqueMatches = [...new Set(matches)];
-                    findings.push(`MEDIUM: Potential ${type} leaked in response (Found ${uniqueMatches.length} unique)`);
+                    findings.push(`MEDIUM: Potential ${type} leaked in ${label} (Found ${uniqueMatches.length} unique)`);
                     leakDetails.push({
                         type,
+                        label,
                         count: uniqueMatches.length,
                         examples: uniqueMatches.slice(0, 3)
                     });
                 }
             }
+        };
+
+        try {
+            const response = await fetch(target, { signal });
+            requestsMade++;
+            const content = await response.text();
+            scanContent(content, 'response');
+
+            // Probe a guaranteed-404 path: verbose error pages often leak
+            // stack traces and internal paths.
+            try {
+                const notFound = await fetch(new URL('/shipout-404-probe-' + Date.now(), target).toString(), { signal });
+                requestsMade++;
+                if (notFound.status >= 400) {
+                    const errContent = await notFound.text();
+                    scanContent(errContent, 'error page');
+                }
+            } catch { /* non-fatal */ }
 
             return {
                 findings,
-                requestsMade: 1,
+                requestsMade,
                 data: {
                     leaksFound: findings.length,
                     leakDetails,
-                    contentType: response.headers.get('content-type'),
                     target
                 }
             };

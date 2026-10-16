@@ -11,14 +11,16 @@ export const EndpointDiscoveryTool: Tool = {
             const response = await fetch(target, { signal });
             const html = await response.text();
 
-            // Simple regex for link and script extraction
+            // Simple regex for link, script, and form action extraction
             const hrefRegex = /href=["']([^"']+)["']/g;
             const srcRegex = /src=["']([^"']+)["']/g;
+            const actionRegex = /action=["']([^"']+)["']/g;
 
             const hrefMatches = [...html.matchAll(hrefRegex)].map(m => m[1]);
             const srcMatches = [...html.matchAll(srcRegex)].map(m => m[1]);
+            const actionMatches = [...html.matchAll(actionRegex)].map(m => m[1]);
 
-            const links = [...new Set([...hrefMatches, ...srcMatches])]
+            const links = [...new Set([...hrefMatches, ...srcMatches, ...actionMatches])]
                 .filter(l => l.startsWith('/') || l.startsWith(target))
                 .slice(0, 15); // Slightly larger limit
 

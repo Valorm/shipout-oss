@@ -24,6 +24,7 @@ import { SitemapAnalyzerTool } from './sitemap-analyzer';
 import { SubdomainDiscoveryTool } from './subdomain-discovery';
 import { HistoricalDiscoveryTool } from './historical-discovery';
 import { ParameterFuzzerTool } from './parameter-fuzzer';
+import { SensitiveFileProbeTool } from './sensitive-file-probe';
 
 export const availableTools: Record<string, Tool> = {
     'http_probe': HttpProbeTool,
@@ -47,6 +48,7 @@ export const availableTools: Record<string, Tool> = {
     'subdomain_discovery': SubdomainDiscoveryTool,
     'historical_discovery': HistoricalDiscoveryTool,
     'parameter_fuzzer': ParameterFuzzerTool,
+    'sensitive_file_probe': SensitiveFileProbeTool,
     'data_leak_scan': DataLeakScanTool,
     'form_security_analysis': FormSecurityAnalysisTool,
 };

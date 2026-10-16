@@ -19,13 +19,14 @@ export const CorsTestTool: Tool = {
             const findings = [];
 
             if (acao === '*' || acao === 'https://attacker.com') {
-                findings.push(`CORS Misconfiguration: ${target} reflects arbitrary origins or uses '*'`);
+                findings.push(`CORS allows arbitrary origins on ${target} (INFO: CORS is not access control; real protection comes from auth)`);
             }
 
             return {
                 findings,
                 requestsMade: 1,
                 data: {
+                    severity: 'INFO',
                     status: response.status,
                     allowOrigin: acao,
                     allowMethods: response.headers.get('access-control-allow-methods')
