@@ -84,6 +84,7 @@ Results are saved to `.shipout-last.json` after each scan. The next scan compare
 Checks include:
 - Security headers (CSP, HSTS, X-Frame-Options, and more)
 - Hardcoded secrets in JavaScript (AWS keys, GitHub tokens, Stripe keys, and more)
+- PII leakage in API responses (emails, phone numbers on unauthenticated endpoints)
 - Exposed sensitive files (`.env`, `.git/config`, debug routes)
 - Reflected XSS probing
 - CORS misconfiguration
