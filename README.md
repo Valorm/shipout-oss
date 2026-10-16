@@ -1,122 +1,68 @@
 # Shipout
 
-You built your app with AI in a weekend. Shipout makes sure you do not ship it with the doors open.
+You built your app fast. Shipout makes sure you don't ship it with the doors open.
 
-Shipout is a security scanner made for people who build fast. Point it at your app and it checks for the vulnerabilities that AI generated code tends to ship with: exposed API keys sitting in your JavaScript bundle, SQL injection, cross site scripting, open redirects, server side request forgery, and more. Every finding comes with a plain language explanation of how to fix it, not just a severity label.
+Shipout is a security scanner for people who build fast. Point it at your app and it checks for exposed secrets, missing security headers, XSS, open debug routes, and more. Every finding comes with a plain language explanation and a fix.
 
-## Quick start
+No API key. No signup. No runtime to install. Single binary.
+
+## Download
+
+Grab the binary for your platform from [Releases](https://github.com/Valorm/shipout-oss/releases/latest):
+
+- Linux (x64)
+- macOS (Intel and Apple Silicon)
+- Windows (x64)
 
 ```bash
-npx shipout scan https://yourapp.com
-```
-
-No API key needed. Shipout runs its deterministic security checks out of the box.
-
-## Install it
-
-```bash
-npm install -g shipout
-shipout scan https://yourapp.com
+chmod +x shipout-linux-x64
+./shipout-linux-x64 scan https://yourapp.com
 ```
 
 ## Commands
 
-| Command              | What it does                              |
-| -------------------- | ----------------------------------------- |
-| `shipout scan <url>` | Scan an app and report what to fix        |
-| `shipout setup`      | Save your Gemini API key                  |
-| `shipout doctor`     | Check that your environment is ready      |
-| `shipout --help`     | Show all commands                         |
-| `shipout --version`  | Show the installed version                |
-
-Append `--json` to `scan` for machine readable output, or `--debug` to see everything the agents are doing.
-
-## What a finding looks like
-
-```
-[HIGH] SQL Injection (Error-based) on parameter "id"
-
-Endpoint:
-https://yourapp.com/api/users
-
-How to fix it:
-Never build a database query by joining user input into the query string.
-Use parameterized queries (prepared statements) so input is always treated
-as data, never as code.
-```
-
-No security background required. If you can read the fix, you can apply it.
+| Command              | What it does                                        |
+| -------------------- | --------------------------------------------------- |
+| `shipout scan <url>` | Scan a target and report findings                   |
+| `shipout fix <url>`  | Scan and generate fix files for your framework      |
+| `shipout init`       | Scaffold Shipout config and CI workflow into a project |
 
 ## How it works
 
-Shipout sends a team of specialised deterministic agents at your app. One maps out every page, endpoint, and API route it can find, including routes hidden inside your JavaScript bundles. Others probe the app the way an attacker would, testing for injection flaws, leaked secrets, and misconfigurations.
+Shipout runs deterministic security checks. No AI, no cloud, no data leaves your machine except the HTTP requests to your target.
 
-```
-                Orchestrator
-                     │
-        ┌────────────┴────────────┐
-        │            │            │
-   Recon Lane   Surface Lane   Payload Workers
-        │            │            │
-   [Endpoints] → [Queues]  → [Active Probes]
-```
+Checks include:
+- Security headers (CSP, HSTS, X-Frame-Options, and more)
+- Exposed sensitive files (`.env`, `.git/config`, debug routes)
+- Reflected XSS probing
+- CORS misconfiguration
+- Cookie security flags
+- Supabase service role key exposure
+- Stack trace and error message leakage
 
-The agents:
+`shipout fix` detects your framework (Express, Next.js, Fastify, Koa) and generates ready to use fix files.
 
-- **ReconAgent**: Maps the initial surface and seeds the discovery queue.
-- **SurfaceExpansionAgent**: Digs through JavaScript, historical URLs, and subdomains.
-- **PayloadAgent**: A pool of parallel workers running active vulnerability probes (SQLi, XSS, SSRF).
-- **Passive agents**: Continuous data leak and secret discovery monitoring.
+## Responsible use
 
-## Built for modern web apps
+Only scan targets you own or have explicit permission to test. Unauthorized scanning may violate laws or terms of service in your jurisdiction. Shipout is a defensive tool for securing your own applications.
 
-Shipout is made for single page applications, which is what most AI built apps are. It goes beyond simple HTML crawling:
+## Building from source
 
-- **JavaScript route discovery**: Follows Angular, React, and Vue routes.
-- **API endpoint extraction**: Mines `.js` files for internal API paths.
-- **Parameter discovery**: Probes for hidden parameters.
-- **Form security audit**: Checks CSRF protection and insecure form submissions.
-- **Secret scanning**: Finds exposed API keys (AWS, Stripe, Firebase, and others) in your bundles.
+Requires Go 1.21+.
 
-## Run it before every deploy
-
-A GitHub Action is included in `.github/workflows/shipout-scan.yml`. Set your target URL as the `SHIPOUT_TARGET` repository variable (or pass it to `workflow_dispatch`). Every push then scans your staging URL before it reaches production. No API key needed.
-
-## Project structure
-
-```
-apps/
-  cli/          CLI interface
-
-core/
-  agents/       AI investigation agents
-  tools/        scanning tools
-  engine/       scan orchestration logic
-
-packages/
-  shared/       shared utilities
-
-tests/          unit tests
+```bash
+cd go
+go build -o shipout .
+./shipout scan https://yourapp.com
 ```
 
-## Contributing
+Run tests:
 
-Contributions are welcome.
-
-1. Fork the repository
-2. Create a feature branch
-3. Submit a pull request
-
-## Security
-
-If you discover a security issue in Shipout, please report it privately instead of opening a public issue.
-
-Contact: [security@valorm.xyz](mailto:security@valorm.xyz)
+```bash
+cd go
+go test ./...
+```
 
 ## License
 
-MIT License
-
-## Status
-
-Shipout is in early development and evolving rapidly. It is built by Valorm Technologies.
+MIT. See [LICENSE](LICENSE).
