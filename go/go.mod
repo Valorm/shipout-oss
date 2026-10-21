@@ -1,3 +1,3 @@
 module github.com/valorm/shipout
 
-go 1.21
+go 1.27
