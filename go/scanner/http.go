@@ -34,7 +34,11 @@ func NewHTTPClient(requests *int64) *HTTPClient {
 				if len(via) >= maxRedirects {
 					return fmt.Errorf("too many redirects")
 				}
-				return nil
+				// Every redirect hop is rechecked against the egress policy
+				// (docs/trust-boundary.md Zone E: no internal IPs, no
+				// metadata APIs), so a public target cannot bounce the
+				// scanner into a restricted address.
+				return ValidateEgressHost(req.Context(), req.URL.Hostname())
 			},
 		},
 		requests: requests,
