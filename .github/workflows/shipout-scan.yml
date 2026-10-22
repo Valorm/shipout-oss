@@ -25,6 +25,19 @@ jobs:
           npm ci --no-audit --no-fund
           npm run build
 
+      - name: Run tests
+        run: npx vitest run
+
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go/go.mod
+
+      - name: Vet and test Go module
+        working-directory: go
+        run: |
+          go vet ./...
+          go test ./...
+
       - name: Run Shipout scan
         run: |
           TARGET="${{ inputs.target }}"
